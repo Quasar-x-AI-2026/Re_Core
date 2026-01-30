@@ -14,127 +14,123 @@ import TrajectoryHistory from '@/components/TrajectoryHistory';
 import { exportTrajectoryJSON, exportRoadmapMarkdown } from '@/utils/exportUtils';
 import { toast } from 'sonner';
 
-
-//some bug is present  || working on it ||
-
-
 export const DashboardPage = ({ user }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { signals: initialSignals, userData } = location.state || {};
-  
+
   const [activeTab, setActiveTab] = useState('overview');
   const { trajectory, insights, cvscEvaluation, roadmap, mentorSignal, processSignals, loadTrajectory, loading } = useRECORE(userData?.id || user?.id);
 
   useEffect(() => {
-    // Only run once on mount
-    const initializeData = async () => {
-      const userId = userData?.id || user?.id;
-      if (!userId) return;
+    if (!initialSignals || initialSignals.length === 0) return;
 
-      // If we have initialSignals from questionnaire, process them
-      if (initialSignals && initialSignals.length > 0) {
-        await processSignals(initialSignals, {
-          grade: userData?.grade || user?.grade,
-          board: userData?.board || user?.board,
-          curriculumCommitted: false
-        });
-      } else if (!trajectory) {
-        // Otherwise, try to load existing trajectory
-        await loadTrajectory();
-      }
-    };
+    processSignals(initialSignals, {
+      grade: userData?.grade || user?.grade,
+      board: userData?.board || user?.board,
+      curriculumCommitted: false
+    });
+  }, []);
 
-    initializeData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run once on mount
 
   const handleCurriculumCommit = async () => {
     const userId = userData?.id || user?.id;
-    
+    let localRoadmap = null;
+    let backendError = false;
+
     try {
       toast.info('Generating your personalized roadmap...');
-      
-      // Step 1: Save commitment first
+
+      // Step 1: Save commitment (Optional/Best Effort)
       console.log('Step 1: Saving commitment for user:', userId);
-      const commitResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/curriculum/commit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: userId,
-          committed: true
-        })
-      });
-
-      if (!commitResponse.ok) {
-        const error = await commitResponse.text();
-        console.error('Commitment save failed:', error);
-        throw new Error('Failed to save commitment');
+      try {
+        const commitResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/curriculum/commit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: userId,
+            committed: true
+          })
+        });
+        if (!commitResponse.ok) throw new Error('Commitment save failed');
+        console.log('Step 1 complete: Commitment saved');
+      } catch (e) {
+        console.warn('Backend unavailable (Step 1), proceeding offline:', e);
+        backendError = true;
       }
-      
-      const commitData = await commitResponse.json();
-      console.log('Step 1 complete: Commitment saved', commitData);
 
-      // Step 2: Generate roadmap by reprocessing with curriculumCommitted=true
+      // Step 2: Generate roadmap (Local)
       console.log('Step 2: Generating roadmap...');
-      
-      // Get signals from backend to reprocess
-      const signalsResponse = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/signals/user/${userId}`
-      );
-      
-      if (!signalsResponse.ok) {
-        throw new Error('Failed to load signals');
+
+      // Use existing signals if available locally or try to fetch
+      let currentSignals = initialSignals;
+      if (!currentSignals || currentSignals.length === 0) {
+        try {
+          const signalsResponse = await fetch(
+            `${process.env.REACT_APP_BACKEND_URL}/api/signals/user/${userId}`
+          );
+          if (signalsResponse.ok) {
+            currentSignals = await signalsResponse.json();
+          }
+        } catch (e) {
+          console.warn('Could not fetch signals from backend, using available state');
+        }
       }
-      
-      const savedSignals = await signalsResponse.json();
-      console.log('Loaded signals:', savedSignals.length);
-      
-      const result = await processSignals(savedSignals, {
+
+      // If we still don't have signals and can't generate, we might need dummy data or fail
+      // But usually initialSignals from location.state should be there from the quiz
+
+      // Process locally
+      const result = await processSignals(currentSignals || [], {
         grade: userData?.grade || user?.grade,
         board: userData?.board || user?.board,
         curriculumCommitted: true
       });
 
       if (!result || !result.roadmap || result.roadmap.length === 0) {
-        console.error('No roadmap generated:', result);
-        throw new Error('Failed to generate roadmap');
+        throw new Error('Failed to generate roadmap locally');
       }
-      
-      console.log('Step 2 complete: Roadmap generated with', result.roadmap.length, 'modules');
 
-      // Step 3: Save roadmap to backend
-      console.log('Step 3: Saving roadmap to backend...');
-      const roadmapResponse = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/curriculum/roadmap/${userId}`,
-        {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(result.roadmap)
+      localRoadmap = result.roadmap;
+      console.log('Step 2 complete: Roadmap generated locally with', localRoadmap.length, 'modules');
+
+      // Step 3: Save roadmap to backend (Optional/Best Effort)
+      if (!backendError) {
+        console.log('Step 3: Saving roadmap to backend...');
+        try {
+          const roadmapResponse = await fetch(
+            `${process.env.REACT_APP_BACKEND_URL}/api/curriculum/roadmap/${userId}`,
+            {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(result.roadmap)
+            }
+          );
+          if (!roadmapResponse.ok) throw new Error('Roadmap save failed');
+          console.log('Step 3 complete: Roadmap saved');
+        } catch (e) {
+          console.warn('Backend unavailable (Step 3), proceeding offline:', e);
+          backendError = true;
         }
-      );
-
-      if (!roadmapResponse.ok) {
-        const error = await roadmapResponse.text();
-        console.error('Roadmap save failed:', error);
-        throw new Error('Failed to save roadmap');
       }
-      
-      const roadmapResult = await roadmapResponse.json();
-      console.log('Step 3 complete: Roadmap saved', roadmapResult);
 
-      toast.success('Curriculum committed! Redirecting to roadmap...');
-      
+      const successMessage = backendError
+        ? 'Roadmap generated locally! (Backend unavailable)'
+        : 'Curriculum committed! Redirecting to roadmap...';
+
+      toast.success(successMessage);
+
       // Navigate with data
       setTimeout(() => {
-        navigate('/roadmap', { 
-          state: { 
+        navigate('/roadmap', {
+          state: {
             userData: userData || user,
-            roadmapData: result.roadmap 
+            roadmapData: localRoadmap
           },
           replace: true
         });
       }, 1000);
+
     } catch (error) {
       console.error('Error in handleCurriculumCommit:', error);
       toast.error(`Failed: ${error.message}`);
@@ -168,9 +164,8 @@ export const DashboardPage = ({ user }) => {
             <button
               data-testid="nav-overview"
               onClick={() => setActiveTab('overview')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                activeTab === 'overview' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50'
-              }`}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'overview' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50'
+                }`}
             >
               <TrendingUp className="w-5 h-5" />
               <span className="font-medium">Overview</span>
@@ -263,36 +258,36 @@ export const DashboardPage = ({ user }) => {
 
               {/* Insights */}
               <div className="space-y-6">
-              {insights && insights.map((insight, idx) => (
-                <Card key={idx} data-testid={`insight-card-${idx}`} className="shadow-lg hover:shadow-xl transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <Badge variant="secondary" className="mb-2">{insight.category}</Badge>
-                        <CardTitle className="text-lg">{insight.label}</CardTitle>
+                {insights && insights.map((insight, idx) => (
+                  <Card key={idx} data-testid={`insight-card-${idx}`} className="shadow-lg hover:shadow-xl transition-shadow">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <Badge variant="secondary" className="mb-2">{insight.category}</Badge>
+                          <CardTitle className="text-lg">{insight.label}</CardTitle>
+                        </div>
+                        <Badge variant="outline" className="text-xs">
+                          {Math.round(insight.confidence * 100)}% confidence
+                        </Badge>
                       </div>
-                      <Badge variant="outline" className="text-xs">
-                        {Math.round(insight.confidence * 100)}% confidence
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <p className="text-gray-700">{insight.explanation}</p>
-                    <Separator />
-                    <div className="space-y-2">
-                      <p className="text-xs text-gray-500 font-medium">Signal Source:</p>
-                      <p className="text-xs text-gray-600 bg-gray-50 p-2 rounded">{insight.signalSource}</p>
-                    </div>
-                    {insight.actionable && (
-                      <div className="mt-3 p-3 bg-blue-50 rounded-lg">
-                        <p className="text-sm text-blue-800">
-                          <strong>Actionable:</strong> {insight.actionable}
-                        </p>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <p className="text-gray-700">{insight.explanation}</p>
+                      <Separator />
+                      <div className="space-y-2">
+                        <p className="text-xs text-gray-500 font-medium">Signal Source:</p>
+                        <p className="text-xs text-gray-600 bg-gray-50 p-2 rounded">{insight.signalSource}</p>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
+                      {insight.actionable && (
+                        <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                          <p className="text-sm text-blue-800">
+                            <strong>Actionable:</strong> {insight.actionable}
+                          </p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             </div>
 
@@ -332,7 +327,7 @@ export const DashboardPage = ({ user }) => {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-700 mb-4">{cvscEvaluation.rationale}</p>
-                  
+
                   {cvscEvaluation.requiresConfirmation && (
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
@@ -393,3 +388,4 @@ export const DashboardPage = ({ user }) => {
 };
 
 export default DashboardPage;
+

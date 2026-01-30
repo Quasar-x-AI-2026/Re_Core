@@ -1,188 +1,193 @@
-🧠 Core Idea
+RECORE
+Redefining Education & Career Opportunities with Real-time Evaluation
 
-“There are no right or wrong answers — we observe how you decide, not what you know.”
+📌 Project Status
+Early Development / Foundation Stage (Hackathon Phase)
 
-RECORE transforms micro-signals into:
+RECORE is currently in its initial development phase.
+The focus of this stage is to establish and validate the core reasoning engine, not to deliver a complete or production-ready system.
 
-Learning stability
+🧠 What is RECORE?
+RECORE is a long-term learner companion system designed to help students:
 
-Exploration vs consolidation behavior
+understand how their learning is progressing over time
 
-Confidence momentum
+identify persistent confusion early
 
-Curriculum readiness (CVSC)
+avoid continuing blindly into risky academic or career decisions
 
-Mentorship signals
+RECORE does not:
 
-###🏗️ Architecture Overview
-###Frontend (React)
- ├─ Questionnaire (collects signals)
- ├─ RECORE Engine (pure, deterministic JS engine)
- ├─ Trajectory Visualization (3D Globe)
- └─ Dashboard (Insights, CVSC, Roadmap)
+predict careers or outcomes
 
-###Backend (Flask)
- ├─ User persistence
- ├─ Signal storage
- └─ (WIP) Trajectory persistence APIs
+replace teachers or counsellors
 
+rank or compare students
 
-⚠️ Important design choice
-The RECORE Engine runs entirely on the frontend.
-The backend is intentionally kept lightweight and stores only raw signals and metadata.
+automate irreversible decisions
 
-📁 Project Structure
-###backend/
- ├─ app.py                # Flask API (users + signals)
- ├─ instance/
- │   └─ data.db            # SQLite (local only, ignored in git)
- └─ venv/                  # Python virtualenv (ignored)
+The system focuses on decision awareness, not automation.
 
-###frontend/
- ├─ src/
- │   ├─ engine/            # Core RECORE intelligence (pure functions)
- │   │   ├─ recoreEngine.js
- │   │   ├─ signalExtractor.js
- │   │   ├─ trajectoryModel.js
- │   │   └─ roadmapBuilder.js
- │   ├─ hooks/
- │   │   └─ useRECORE.js   # React ↔ Engine bridge
- │   ├─ pages/
- │   │   ├─ QuestionnaireFlow.jsx
- │   │   └─ DashboardPage.jsx
- │   └─ components/
- │       └─ TrajectoryGlobe.jsx
- ├─ public/
- └─ package.json
+🎯 Core Idea
+At the heart of RECORE lies the Learner Trajectory Model (LTM).
 
-🔬 RECORE Engine (Frontend)
+A learner trajectory represents:
 
-The engine is pure and deterministic:
+the evolving direction and stability of a learner over time, derived from observed learning behavior, engagement patterns, and consistency — not from one-time tests or labels.
 
-recorEngine(rawSignals, questionBank, context, existingTrajectory)
+Core principles:
 
-Processing Pipeline
+Behavior first, marks second
 
-Signal Extraction
+Longitudinal understanding, not snapshots
 
-Timing variance
+Explainable reasoning over opaque intelligence
 
-Confidence variance
+⚙️ RECORE Engine (Current Scope)
+In this hackathon phase, the RECORE engine is:
 
-Hesitation patterns
+Rule-driven
 
-Latent Scoring
+Explainable
 
-Exploration
+Human-auditable
 
-Depth orientation
+Cloud-dependent (online)
 
-Application preference
+Use of Groq Chat Model
+RECORE currently integrates a Groq-hosted chat model to assist with:
 
-Feature Derivation
+interpreting learner inputs and reflections
 
-Stability index
+structuring guidance responses
 
-Exploration index
+maintaining conversational clarity
 
-Self-trust vs guidance
+⚠️ Important clarification:
 
-Trajectory Modeling
+The Groq model does not make decisions
 
-3D learning space
+It does not predict learner outcomes
 
-Momentum + stability
+It does not replace the Learner Trajectory logic
 
-Explainable Insights
+All final judgments (stability, uncertainty, escalation) are governed by explicit rules and thresholds defined by the system, not by the model.
 
-Every insight maps to concrete signals
+The model acts as a reasoning and interaction layer, not a black-box authority.
 
-📊 Dashboard Outputs
+🔄 High-Level System Flow
+Learning Interaction
+Learner engages with content or problem statements
 
-Learning Stability (%)
+Problem-Solving Attempts
+Learner applies understanding
 
-Exploration Mode
+Behavior Observation
+Patterns such as repetition, hesitation, and stalled attempts are tracked
 
-Confidence Momentum
+Rule-Based Evaluation
 
-3D Trajectory Globe
+Stable patterns → no intervention
 
-Explainable Insights
+Persistent uncertainty → flagged for guidance
 
-CVSC (Curriculum Voluntary Structural Commitment)
+Guidance & Escalation
 
-Mentorship Recommendation
+Flow-based, pre-scripted guidance
 
-🧪 Current Status
-✅ Working
+Human help suggested only when uncertainty remains unresolved
 
-Questionnaire flow
+The system never forces decisions.
 
-Signal capture & storage
+🧩 Guidance Philosophy
+RECORE follows a layered response structure:
 
-Frontend RECORE engine
+Understanding → observe over time
 
-Dashboard visualization
+Guidance → structured, explainable prompts
 
-Insight generation
+Action → learner retries or reflects
 
-CVSC logic (frontend)
+Escalation → human support when system limits are reached
 
-⚠️ Known Limitations
+All guidance is:
 
-Backend does not yet implement:
+explainable
 
-/api/trajectory
+traceable
 
-/api/curriculum/*
+reversible
 
-Some dashboard values may show NaN when:
+🌐 Interface Status
+Web-based interface (early stage)
 
-Insufficient signals exist
+Used to:
 
-Backend trajectory fetch returns 404
+visualize learning flow
 
-Trajectory persistence is WIP
+display uncertainty indicators
 
-These are expected in the current phase and tracked intentionally.
+test reasoning logic
 
+The interface is functional but minimal, and exists to support engine validation rather than presentation polish.
 
-🔐 Git & Commit Philosophy
+❌ Current Limitations (Explicit)
+At this stage, RECORE is:
 
-node_modules/, venv/, .env, data.db are never committed
+❌ Not offline-capable
 
-Commits are layered:
+❌ Not production-ready
 
-Repo structure
+❌ Not using machine learning for prediction
 
-Backend persistence
+❌ Not automating decisions
 
-Frontend UI
+Offline execution and local-first processing are future considerations, not current claims.
 
-Engine logic
+🛠️ Why We Started This Way
+Rather than beginning with UI or feature expansion, RECORE begins with:
 
-Fixes & refinements
+reasoning correctness
 
-📌 Roadmap
+ethical safeguards
 
- Backend trajectory persistence
+explainability
 
- Curriculum roadmap storage
+human-aligned decision boundaries
 
- Multi-session trajectory evolution
+This ensures that future scaling does not compromise trust or clarity.
 
- Comparative cohort insights
+🚀 Roadmap (High-Level)
+v0.5 (Current)
+Rule-based trajectory logic + Groq-assisted interaction layer
 
- Mentor matching engine
+v1
+Rule refinement, clearer mentorship workflows
 
-🧭 Vision
+v2
+Optional analytics assistance (still explainable)
 
-RECORE is not an assessment tool.
+v3 (Optional)
+ML-assisted rule refinement (never replacing trajectory logic)
 
-It is an intelligence layer that:
+🧠 Design Commitments
+No AI hype
 
-Respects uncertainty
+No black-box authority
 
-Treats exploration as a signal, not noise
+No forced decisions
 
-Encourages autonomy over prescription
+Human judgment always prioritized
+
+📍 Summary
+RECORE is intentionally at the foundation stage.
+
+Our progress is measured by:
+
+correctness of logic
+
+clarity of system boundaries
+
+honesty about limitations
+
+Not by feature count.

@@ -1,15 +1,3 @@
-/**
- * RECORE Engine: Core orchestrator for trajectory inference and guidance generation
- * 
- * CORE PRINCIPLES (ENCODED):
- * 1. Weak Signal Intelligence - patterns emerge from aggregation
- * 2. Non-Determinism - same answers + different confidence = different outcomes
- * 3. Reversibility - no recommendation is permanent
- * 4. Explainability - every output is traceable to signals
- * 
- * This is NOT a recommendation engine. This is a trajectory inference system.
- */
-
 import { extractSignals, deriveFeatures, aggregateLatentScores } from './signalExtractor';
 import { initializeTrajectory, updateTrajectory, interpretTrajectory } from './trajectoryModel';
 import { buildRoadmap, shouldAllowCurriculumProjection } from './roadmapBuilder';
@@ -28,7 +16,7 @@ export function recoreEngine(rawSignals, questionBank, context = {}, existingTra
   // STEP 1: Extract statistical signals from raw interactions
   // These are atomic, timestamped behavioral markers
   const signals = extractSignals(rawSignals);
-  
+
   // STEP 2: Aggregate latent dimension scores from question mappings
   // This combines user choices with confidence weighting
   const responses = rawSignals.map(r => ({
@@ -37,11 +25,11 @@ export function recoreEngine(rawSignals, questionBank, context = {}, existingTra
     confidence: r.confidence
   }));
   const latentScores = aggregateLatentScores(responses, questionBank);
-  
+
   // STEP 3: Derive interpretable features from signals and latent scores
   // This is where "intelligence emerges from weak signals"
   const features = deriveFeatures(signals, latentScores);
-  
+
   // STEP 4: Initialize or update trajectory in 3D learning space
   // Trajectory = current position + momentum in learning space
   let trajectory;
@@ -50,26 +38,26 @@ export function recoreEngine(rawSignals, questionBank, context = {}, existingTra
   } else {
     trajectory = initializeTrajectory(features);
   }
-  
+
   // STEP 5: Generate explainable insights
   // Every insight must be traceable to specific signals
   const insights = generateInsights(features, signals, latentScores, trajectory);
-  
+
   // STEP 6: Evaluate CVSC (Curriculum Voluntary Structural Commitment) eligibility
   // Only suggest curriculum projection when stability threshold is met
   const cvscEvaluation = evaluateCVSC(trajectory, features, context);
-  
+
   // STEP 7: Generate roadmap if CVSC is confirmed
   // Roadmap is a projection, not a prescription
   let roadmap = null;
   if (context.curriculumCommitted && cvscEvaluation.allowed) {
     roadmap = buildRoadmap(trajectory, features, latentScores, context.curriculum);
   }
-  
+
   // STEP 8: Evaluate mentorship signal
   // Mentorship suggested when exploration high + stability low
   const mentorSignal = evaluateMentorshipSignal(trajectory, features);
-  
+
   // STEP 9: Return structured intelligence output
   return {
     trajectory,
@@ -104,7 +92,7 @@ export function recoreEngine(rawSignals, questionBank, context = {}, existingTra
  */
 function generateInsights(features, signals, latentScores, trajectory) {
   const insights = [];
-  
+
   // Insight 1: Learning Style
   if (features.depthOrientation > 6) {
     insights.push({
@@ -125,7 +113,7 @@ function generateInsights(features, signals, latentScores, trajectory) {
       actionable: 'Seek project-based tasks and real-world applications for each topic.'
     });
   }
-  
+
   // Insight 2: Exploration Tendency
   if (features.explorationIndex > 7) {
     insights.push({
@@ -146,7 +134,7 @@ function generateInsights(features, signals, latentScores, trajectory) {
       actionable: 'Consider occasional exploration tasks to discover hidden interests.'
     });
   }
-  
+
   // Insight 3: Stability & Consistency
   if (features.stabilityIndex > 7) {
     insights.push({
@@ -167,7 +155,7 @@ function generateInsights(features, signals, latentScores, trajectory) {
       actionable: 'Experiment with different study schedules to find what works best for you.'
     });
   }
-  
+
   // Insight 4: Autonomy vs Guidance
   if (features.selfTrustIndex > 7) {
     insights.push({
@@ -188,7 +176,7 @@ function generateInsights(features, signals, latentScores, trajectory) {
       actionable: 'Follow structured roadmaps and seek mentor guidance for complex topics.'
     });
   }
-  
+
   // Insight 5: Confidence Momentum
   if (signals.confidenceStats.trendSlope > 0.2) {
     insights.push({
@@ -209,7 +197,7 @@ function generateInsights(features, signals, latentScores, trajectory) {
       actionable: 'Consider shorter study sessions with breaks. Address any underlying concerns.'
     });
   }
-  
+
   return insights;
 }
 
@@ -234,9 +222,10 @@ function evaluateCVSC(trajectory, features, context) {
     explorationCheck: features.explorationIndex < 7.5,
     userConfirmation: context.curriculumCommitted || false
   };
-  
-  const allowed = checks.gradeCheck && checks.boardCheck && checks.stabilityCheck && checks.explorationCheck;
-  
+
+  // Allow commitment if basic eligibility (Grade/Board) is met, regardless of stability
+  const allowed = checks.gradeCheck && checks.boardCheck;
+
   let rationale = '';
   if (!checks.gradeCheck || !checks.boardCheck) {
     rationale = 'Curriculum projection currently available only for CBSE Class 10 students.';
@@ -249,7 +238,7 @@ function evaluateCVSC(trajectory, features, context) {
   } else {
     rationale = 'Curriculum commitment active. Roadmap is being generated based on your trajectory.';
   }
-  
+
   return {
     allowed,
     requiresConfirmation: allowed && !checks.userConfirmation,
@@ -275,11 +264,11 @@ function evaluateMentorshipSignal(trajectory, features) {
     validationNeed: features.externalInfluenceIndex > 7 && features.selfTrustIndex < 4,
     decisionParalysis: features.explorationIndex > 6 && features.decisivenessIndex < 4
   };
-  
+
   let required = false;
   let strength = 'low';
   let reason = '';
-  
+
   if (conditions.explorationOverload) {
     required = true;
     strength = 'high';
@@ -298,7 +287,7 @@ function evaluateMentorshipSignal(trajectory, features) {
   } else {
     reason = 'Your signals indicate strong self-direction. Mentorship available if needed later.';
   }
-  
+
   return {
     required,
     strength,

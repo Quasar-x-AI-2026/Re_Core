@@ -14,14 +14,14 @@ Curriculum readiness (CVSC)
 
 Mentorship signals
 
-🏗️ Architecture Overview
-Frontend (React)
+###🏗️ Architecture Overview
+###Frontend (React)
  ├─ Questionnaire (collects signals)
  ├─ RECORE Engine (pure, deterministic JS engine)
  ├─ Trajectory Visualization (3D Globe)
  └─ Dashboard (Insights, CVSC, Roadmap)
 
-Backend (Flask)
+###Backend (Flask)
  ├─ User persistence
  ├─ Signal storage
  └─ (WIP) Trajectory persistence APIs
@@ -32,13 +32,13 @@ The RECORE Engine runs entirely on the frontend.
 The backend is intentionally kept lightweight and stores only raw signals and metadata.
 
 📁 Project Structure
-backend/
+###backend/
  ├─ app.py                # Flask API (users + signals)
  ├─ instance/
  │   └─ data.db            # SQLite (local only, ignored in git)
  └─ venv/                  # Python virtualenv (ignored)
 
-frontend/
+###frontend/
  ├─ src/
  │   ├─ engine/            # Core RECORE intelligence (pure functions)
  │   │   ├─ recoreEngine.js

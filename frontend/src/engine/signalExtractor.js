@@ -1,13 +1,4 @@
 /**
- * Signal Extractor: Converts raw user interactions into statistical features
- * 
- * PRINCIPLE: Weak Signal Intelligence
- * - Each question alone is meaningless
- * - Patterns across questions reveal cognitive tendencies
- * - Confidence, hesitation, and consistency matter more than answers
- */
-
-/**
  * Extract statistical signals from raw interaction data
  * 
  * @param {Array} signalRecords - Array of SignalRecord objects
@@ -81,9 +72,12 @@ export function deriveFeatures(signals, latentScores) {
 
   // Stability Index: Consistency and predictability in learning behavior
   // Low time variance + high consistency = high stability
+  // Use decay function for time variance to handle outliers (e.g. 47M ms) without going negative
+  const timeVarianceScore = (1 / (1 + hesitationStats.timeVariance / 50000)) * 10;
+
   const stabilityIndex = normalize(
     (consistencyStats.responsePattern === 'consistent' ? 8 : 4) * 0.3 +
-    ((1 - hesitationStats.timeVariance / 100000) * 10) * 0.3 +
+    timeVarianceScore * 0.3 +
     (engagementStats.focusScore * 10) * 0.4,
     0, 10
   );
@@ -137,8 +131,8 @@ export function deriveFeatures(signals, latentScores) {
     applicationOrientation,
     // Meta-features for CVSC decision
     cvscEligibility: stabilityIndex > 6.5 && explorationIndex < 7,
-    mentorshipSignalStrength: (explorationIndex > 7 && stabilityIndex < 5) ? 'high' : 
-                               (explorationIndex > 5 || stabilityIndex < 6) ? 'medium' : 'low'
+    mentorshipSignalStrength: (explorationIndex > 7 && stabilityIndex < 5) ? 'high' :
+      (explorationIndex > 5 || stabilityIndex < 6) ? 'medium' : 'low'
   };
 }
 
@@ -168,7 +162,7 @@ function computeTrendSlope(values) {
   const ySum = values.reduce((a, b) => a + b, 0);
   const xySum = values.reduce((sum, y, x) => sum + x * y, 0);
   const xSquareSum = (n * (n - 1) * (2 * n - 1)) / 6;
-  
+
   const slope = (n * xySum - xSum * ySum) / (n * xSquareSum - xSum * xSum);
   return slope;
 }
@@ -200,7 +194,7 @@ function detectResponsePattern(records) {
   // Detect if responses show consistent behavior
   const confidences = records.map(r => r.confidence);
   const stdDev = standardDeviation(confidences);
-  
+
   if (stdDev < 1.5) return 'consistent';
   if (stdDev > 3) return 'erratic';
   return 'moderate';
@@ -225,28 +219,41 @@ function getDefaultSignals() {
  */
 export function aggregateLatentScores(responses, questionBank) {
   const scores = {};
-  
+
   responses.forEach(response => {
     const question = questionBank.find(q => q.id === response.questionId);
     if (!question) return;
-    
+
     const selectedOption = question.options.find(opt => opt.label === response.selectedOption);
     if (!selectedOption) return;
-    
+
     // Apply confidence weighting to dimension scores
     const confidenceWeight = response.confidence / 10;
-    
+
     Object.entries(selectedOption.map).forEach(([dimension, baseScore]) => {
       if (!scores[dimension]) scores[dimension] = 0;
       scores[dimension] += baseScore * confidenceWeight;
     });
   });
-  
+
   // Normalize scores to 0-10 range
   const maxPossibleScore = 15; // Max questions
+
+  // Ensure all dimensions exist to avoid NaN
+  const allDimensions = [
+    'exploration', 'uncertainty', 'support', 'autonomy',
+    'structureNeed', 'pressure', 'depth', 'reflection',
+    'application', 'execution'
+  ];
+
+  allDimensions.forEach(dim => {
+    if (scores[dim] === undefined) scores[dim] = 0;
+  });
+
   Object.keys(scores).forEach(key => {
     scores[key] = normalize(scores[key], 0, 10);
   });
-  
+
   return scores;
 }
+

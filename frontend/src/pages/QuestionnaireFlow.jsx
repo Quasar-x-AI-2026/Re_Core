@@ -7,6 +7,8 @@ import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { QUESTION_BANK } from '@/data/questionBank';
 
+// may be buggy ||working on it||
+
 export const QuestionnaireFlow = ({ user, onComplete }) => {
   const navigate = useNavigate();
   const location = useLocation();

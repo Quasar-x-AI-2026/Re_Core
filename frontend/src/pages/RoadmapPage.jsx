@@ -30,7 +30,7 @@ export const RoadmapPage = ({ user }) => {
       loadRoadmap();
     }
     loadProgress();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadRoadmap = async () => {
@@ -39,7 +39,7 @@ export const RoadmapPage = ({ user }) => {
       const commitmentResponse = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}/api/curriculum/commit/${user.id}`
       );
-      
+
       if (commitmentResponse.ok) {
         const commitment = await commitmentResponse.json();
         if (commitment.roadmap && commitment.roadmap.length > 0) {
@@ -62,7 +62,7 @@ export const RoadmapPage = ({ user }) => {
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}/api/roadmap/progress/${user.id}`
       );
-      
+
       if (response.ok) {
         const data = await response.json();
         setProgress(data);
@@ -85,7 +85,7 @@ export const RoadmapPage = ({ user }) => {
   const handleCheckpointClick = (module, checkpoint) => {
     setSelectedModule(module);
     setCurrentCheckpoint(checkpoint);
-    
+
     if (checkpoint.type === 'progress_check') {
       setShowProgressModal(true);
     } else if (checkpoint.type === 'exploration') {
@@ -274,15 +274,36 @@ export const RoadmapPage = ({ user }) => {
 
           {/* Modules */}
           {modules.map((module, moduleIndex) => {
-            const completedCount = module.checkpoints.filter(cp => 
+            const completedCount = module.checkpoints.filter(cp =>
               isCheckpointCompleted(cp.id)
             ).length;
 
+            const handleModuleClick = async () => {
+              if (module.name === "Chemical Reactions & Equations") {
+                try {
+                  toast.info("Starting learning session...");
+                  await fetch("https://pranjal01.app.n8n.cloud/webhook-test/8e140df6-bf01-4d0f-ba35-49d62c661e5a", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      "Topic": "Chemical Reactions and Equatiions", // Keeping original typo if intended, or fixing it? User said "Equatiions" in one place and "Equations" in another. I will follow the explicit JSON request: "Chemical Reactions and Equatiions" from prompt
+                      "Subtopic": "Types of Chemical Reactions, Oxidation-Reduction"
+                    })
+                  });
+                  toast.success("Learning context sent to AI Tutor");
+                } catch (error) {
+                  console.error("Webhook failed", error);
+                  toast.error("Failed to start session");
+                }
+              }
+            };
+
             return (
-              <Card 
-                key={module.id} 
-                className="mb-6 bg-slate-800/50 border-slate-700 backdrop-blur-sm"
+              <Card
+                key={module.id}
+                className={`mb-6 bg-slate-800/50 border-slate-700 backdrop-blur-sm ${module.name === "Chemical Reactions & Equations" ? "cursor-pointer hover:border-blue-500/50 transition-colors" : ""}`}
                 data-testid={`module-${moduleIndex}`}
+                onClick={handleModuleClick}
               >
                 <CardHeader className="border-b border-slate-700">
                   <div className="flex items-start justify-between">
@@ -310,21 +331,22 @@ export const RoadmapPage = ({ user }) => {
                         <div
                           key={checkpoint.id}
                           data-testid={`checkpoint-${idx}`}
-                          className={`group relative flex items-start gap-4 p-4 rounded-lg transition-all ${
-                            completed
-                              ? 'bg-green-500/10 border-2 border-green-500/50'
-                              : unlocked
+                          className={`group relative flex items-start gap-4 p-4 rounded-lg transition-all ${completed
+                            ? 'bg-green-500/10 border-2 border-green-500/50'
+                            : unlocked
                               ? 'bg-slate-700/30 border-2 border-slate-600 hover:border-blue-500/50 cursor-pointer'
                               : 'bg-slate-800/30 border-2 border-slate-700/50'
-                          }`}
-                          onClick={() => unlocked && !completed && handleCheckpointClick(module, checkpoint)}
+                            }`}
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent module click when clicking checkpoint
+                            if (unlocked && !completed) handleCheckpointClick(module, checkpoint);
+                          }}
                         >
                           {/* Icon */}
-                          <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
-                            completed ? 'bg-green-500' :
+                          <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${completed ? 'bg-green-500' :
                             unlocked ? getCheckpointColor(checkpoint.type) :
-                            'bg-slate-700'
-                          }`}>
+                              'bg-slate-700'
+                            }`}>
                             {completed ? (
                               <CheckCircle2 className="w-5 h-5 text-white" />
                             ) : unlocked ? (
@@ -342,14 +364,14 @@ export const RoadmapPage = ({ user }) => {
                                 <Badge variant="secondary" className="text-xs">Optional</Badge>
                               )}
                             </div>
-                            
+
                             {checkpoint.type === 'content' && checkpoint.topics && (
                               <p className="text-sm text-gray-400">
                                 Topics: {checkpoint.topics.slice(0, 2).join(', ')}
                                 {checkpoint.topics.length > 2 && ` +${checkpoint.topics.length - 2} more`}
                               </p>
                             )}
-                            
+
                             {checkpoint.type === 'exploration' && (
                               <div className="mt-2">
                                 <Badge variant="outline" className="text-purple-400 border-purple-400 text-xs">
@@ -375,14 +397,13 @@ export const RoadmapPage = ({ user }) => {
 
                           {/* Checkpoint Type Label */}
                           <div className="flex-shrink-0">
-                            <span className={`text-xs px-2 py-1 rounded ${
-                              checkpoint.type === 'content' ? 'bg-blue-500/20 text-blue-300' :
+                            <span className={`text-xs px-2 py-1 rounded ${checkpoint.type === 'content' ? 'bg-blue-500/20 text-blue-300' :
                               checkpoint.type === 'exploration' ? 'bg-purple-500/20 text-purple-300' :
-                              'bg-teal-500/20 text-teal-300'
-                            }`}>
+                                'bg-teal-500/20 text-teal-300'
+                              }`}>
                               {checkpoint.type === 'content' ? 'Curriculum' :
-                               checkpoint.type === 'exploration' ? 'Exploration' :
-                               'Reflection'}
+                                checkpoint.type === 'exploration' ? 'Exploration' :
+                                  'Reflection'}
                             </span>
                           </div>
                         </div>
@@ -398,8 +419,8 @@ export const RoadmapPage = ({ user }) => {
                         {completedCount}/{module.checkpoints.length}
                       </span>
                     </div>
-                    <Progress 
-                      value={(completedCount / module.checkpoints.length) * 100} 
+                    <Progress
+                      value={(completedCount / module.checkpoints.length) * 100}
                       className="h-2 bg-slate-700"
                     />
                   </div>
@@ -486,18 +507,18 @@ export const RoadmapPage = ({ user }) => {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {Object.entries(modulesBySubject).map(([subject, modules]) => {
             const completedCount = modules.reduce((acc, module) => {
-              const moduleProgress = module.checkpoints.filter(cp => 
+              const moduleProgress = module.checkpoints.filter(cp =>
                 isCheckpointCompleted(cp.id)
               ).length;
               return acc + moduleProgress;
             }, 0);
 
-            const totalCheckpoints = modules.reduce((acc, module) => 
+            const totalCheckpoints = modules.reduce((acc, module) =>
               acc + module.checkpoints.length, 0
             );
 
-            const progressPercent = totalCheckpoints > 0 
-              ? (completedCount / totalCheckpoints) * 100 
+            const progressPercent = totalCheckpoints > 0
+              ? (completedCount / totalCheckpoints) * 100
               : 0;
 
             return (

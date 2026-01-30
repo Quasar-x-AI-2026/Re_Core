@@ -14,6 +14,10 @@ import TrajectoryHistory from '@/components/TrajectoryHistory';
 import { exportTrajectoryJSON, exportRoadmapMarkdown } from '@/utils/exportUtils';
 import { toast } from 'sonner';
 
+
+//some bug is present  || working on it ||
+
+
 export const DashboardPage = ({ user }) => {
   const location = useLocation();
   const navigate = useNavigate();

@@ -9,7 +9,7 @@ export function extractSignals(signalRecords) {
     return getDefaultSignals();
   }
 
-  // Compute confidence statistics
+  //Compute confidence statistics
   const confidences = signalRecords.map(r => r.confidence);
   const confidenceStats = {
     mean: mean(confidences),
@@ -18,7 +18,7 @@ export function extractSignals(signalRecords) {
     volatilityIndex: standardDeviation(confidences) / mean(confidences) // CV
   };
 
-  // Compute hesitation statistics
+  //Compute hesitation statistics
   const timings = signalRecords.map(r => r.timeSpentMs);
   const hesitationStats = {
     avgTimePerQuestion: mean(timings),
@@ -27,14 +27,14 @@ export function extractSignals(signalRecords) {
     timeVariance: variance(timings)
   };
 
-  // Compute consistency statistics
+  //Compute consistency statistics
   const consistencyStats = {
     skippedQuestions: signalRecords.filter(r => r.skipped).length,
     orderDeviation: computeOrderDeviation(signalRecords),
     responsePattern: detectResponsePattern(signalRecords)
   };
 
-  // Compute engagement statistics
+  //Compute engagement statistics
   const engagementStats = {
     completionRate: signalRecords.filter(r => !r.skipped).length / signalRecords.length,
     averageEngagement: mean(timings) > 5000 && mean(timings) < 60000 ? 1 : 0.5,
@@ -61,8 +61,8 @@ export function extractSignals(signalRecords) {
 export function deriveFeatures(signals, latentScores) {
   const { confidenceStats, hesitationStats, consistencyStats, engagementStats } = signals;
 
-  // Exploration Index: Tendency to explore vs stick to known paths
-  // High confidence variance + diverse choices = high exploration
+  //Exploration Index: Tendency to explore vs stick to known paths
+  //High confidence variance + diverse choices = high exploration
   const explorationIndex = normalize(
     (confidenceStats.variance * 0.4) +
     (latentScores.exploration * 0.4) +
@@ -70,9 +70,9 @@ export function deriveFeatures(signals, latentScores) {
     0, 10
   );
 
-  // Stability Index: Consistency and predictability in learning behavior
-  // Low time variance + high consistency = high stability
-  // Use decay function for time variance to handle outliers (e.g. 47M ms) without going negative
+  //Stability Index: Consistency and predictability in learning behavior
+  //Low time variance + high consistency = high stability
+  //Use decay function for time variance to handle outliers (e.g. 47M ms) without going negative
   const timeVarianceScore = (1 / (1 + hesitationStats.timeVariance / 50000)) * 10;
 
   const stabilityIndex = normalize(
@@ -82,7 +82,7 @@ export function deriveFeatures(signals, latentScores) {
     0, 10
   );
 
-  // Decisiveness Index: Speed and confidence in decision-making
+  //Decisiveness Index: Speed and confidence in decision-making
   const decisivenessIndex = normalize(
     (confidenceStats.mean * 0.5) +
     ((1 - hesitationStats.avgTimePerQuestion / 30000) * 10) * 0.3 +
@@ -90,7 +90,7 @@ export function deriveFeatures(signals, latentScores) {
     0, 10
   );
 
-  // Self-Trust Index: Internal confidence vs external validation need
+  //Self-Trust Index: Internal confidence vs external validation need
   const selfTrustIndex = normalize(
     (confidenceStats.mean * 0.4) +
     ((1 - latentScores.support / 10) * 10) * 0.3 +
@@ -98,7 +98,7 @@ export function deriveFeatures(signals, latentScores) {
     0, 10
   );
 
-  // External Influence Index: Reliance on guidance and structure
+  //External Influence Index: Reliance on guidance and structure
   const externalInfluenceIndex = normalize(
     (latentScores.support * 0.4) +
     (latentScores.structureNeed * 0.4) +
@@ -106,7 +106,7 @@ export function deriveFeatures(signals, latentScores) {
     0, 10
   );
 
-  // Depth Orientation: Preference for deep understanding vs surface learning
+  //Depth Orientation: Preference for deep understanding vs surface learning
   const depthOrientation = normalize(
     (latentScores.depth * 0.5) +
     (latentScores.reflection * 0.3) +
@@ -114,7 +114,7 @@ export function deriveFeatures(signals, latentScores) {
     0, 10
   );
 
-  // Application Orientation: Preference for practical vs theoretical
+  //Application Orientation: Preference for practical vs theoretical
   const applicationOrientation = normalize(
     (latentScores.application * 0.6) +
     (latentScores.execution * 0.4),

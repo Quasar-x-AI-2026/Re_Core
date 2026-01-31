@@ -3,7 +3,7 @@ import { trajectoryToSplineCoords } from '@/engine/trajectoryModel';
 
 /**
  * 3D Globe Trajectory Visualization
- * Uses a fallback canvas-based globe when Spline is not available
+ * Uses a fallback canvas based globe when Spline is not available
  */
 export const TrajectoryGlobe = ({ trajectory }) => {
   const canvasRef = useRef(null);

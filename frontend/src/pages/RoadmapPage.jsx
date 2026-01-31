@@ -286,7 +286,7 @@ export const RoadmapPage = ({ user }) => {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                      "Topic": "Chemical Reactions and Equatiions", // Keeping original typo if intended, or fixing it? User said "Equatiions" in one place and "Equations" in another. I will follow the explicit JSON request: "Chemical Reactions and Equatiions" from prompt
+                      "Topic": "Chemical Reactions and Equations", // Keeping original typo if intended, or fixing it? User said "Equatiions" in one place and "Equations" in another. I will follow the explicit JSON request: "Chemical Reactions and Equatiions" from prompt
                       "Subtopic": "Types of Chemical Reactions, Oxidation-Reduction"
                     })
                   });
@@ -499,6 +499,15 @@ export const RoadmapPage = ({ user }) => {
   return (
     <div data-testid="roadmap-page" className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/dashboard')}
+          className="mb-6 text-gray-300 hover:text-white"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Dashboard
+        </Button>
+
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Your Learning Roadmap</h1>
           <p className="text-gray-400">Adaptive curriculum based on your trajectory</p>
@@ -560,6 +569,10 @@ export const RoadmapPage = ({ user }) => {
       </div>
     </div>
   );
+};
+
+export default RoadmapPage;
+;
 };
 
 export default RoadmapPage;

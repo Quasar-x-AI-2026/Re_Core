@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils"
-
+// It helps conditionally merge and manage class names
 function Skeleton({
   className,
   ...props

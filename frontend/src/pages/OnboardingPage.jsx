@@ -54,6 +54,7 @@ export const OnboardingPage = ({ user, onComplete }) => {
   navigate('/questionnaire', { state: { user: userData } });
 };
 
+  
 
   return (
     <div 

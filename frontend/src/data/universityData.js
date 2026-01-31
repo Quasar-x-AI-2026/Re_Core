@@ -1,4 +1,4 @@
-// Demo university data for preference engine
+// Demo university data for preference engine as per choice
 
 export const UNIVERSITY_DATA = [
   {

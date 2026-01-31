@@ -19,7 +19,7 @@ export const MentorshipPage = ({ user }) => {
   useEffect(() => {
     loadTrajectory();
     loadRequests();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadTrajectory = async () => {
@@ -58,20 +58,31 @@ export const MentorshipPage = ({ user }) => {
 
     setLoading(true);
     try {
+      const payload = {
+        userId: String(user.id),
+        trajectoryProfile: getTrajectoryProfile(),
+        questions: questions
+      };
+
+      console.log('Submitting mentorship request:', payload);
+
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}/api/mentorship/request`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId: user.id,
-            trajectoryProfile: getTrajectoryProfile(),
-            questions: questions
-          })
+          body: JSON.stringify(payload)
         }
       );
 
-      if (!response.ok) throw new Error('Failed to submit request');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Submission failed:', response.status, response.statusText, errorData);
+        throw new Error(errorData.detail || 'Failed to submit request');
+      }
+
+      const data = await response.json();
+      console.log('Submission successful:', data);
 
       toast.success('Mentorship request submitted!');
       setSubmitted(true);
@@ -87,7 +98,7 @@ export const MentorshipPage = ({ user }) => {
 
   const getTrajectoryProfile = () => {
     if (!trajectory) return 'Adaptive Learner';
-    
+
     const { directionVector } = trajectory;
     const { abstraction, structure, risk } = directionVector;
 
@@ -99,7 +110,7 @@ export const MentorshipPage = ({ user }) => {
   };
 
   return (
-    <div 
+    <div
       data-testid="mentorship-page"
       className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 p-4 md:p-8"
     >
@@ -161,7 +172,7 @@ export const MentorshipPage = ({ user }) => {
               />
               <Alert className="bg-blue-50 border-blue-200">
                 <AlertDescription className="text-blue-800">
-                  <strong>Note:</strong> Mentorship is about guidance, not correction. 
+                  <strong>Note:</strong> Mentorship is about guidance, not correction.
                   Your mentor will help you explore options, not impose a single path.
                 </AlertDescription>
               </Alert>
@@ -239,3 +250,4 @@ export const MentorshipPage = ({ user }) => {
 };
 
 export default MentorshipPage;
+

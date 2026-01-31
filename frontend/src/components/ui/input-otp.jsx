@@ -1,5 +1,6 @@
 import * as React from "react"
 import { OTPInput, OTPInputContext } from "input-otp"
+// Icon used as a visual separator between OTP groups
 import { Minus } from "lucide-react"
 
 import { cn } from "@/lib/utils"

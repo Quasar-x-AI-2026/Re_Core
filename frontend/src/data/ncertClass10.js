@@ -1,4 +1,4 @@
-// NCERT Class 10 CBSE Curriculum Data
+// NCERT Class 10 Curriculum Data as per CBSE
 // Real subject modules with chapter structure
 
 export const NCERT_CLASS_10 = {

@@ -15,9 +15,9 @@
  */
 export function initializeTrajectory(features) {
   // Map features to 3D learning space coordinates
-  // X-axis: Abstraction (-10 to +10) - Abstract/Theoretical vs Concrete/Applied
-  // Y-axis: Structure (-10 to +10) - Independent vs Guided
-  // Z-axis: Risk (-10 to +10) - Stable/Conservative vs Exploratory/Risk-taking
+  // X-axis:Abstraction (-10 to +10) - Abstract/Theoretical vs Concrete/Applied
+  // Y-axis:Structure (-10 to +10) - Independent vs Guided
+  // Z-axis:Risk (-10 to +10) - Stable/Conservative vs Exploratory/Risk-taking
   
   const abstraction = features.depthOrientation - features.applicationOrientation;
   const structure = features.externalInfluenceIndex - features.selfTrustIndex;

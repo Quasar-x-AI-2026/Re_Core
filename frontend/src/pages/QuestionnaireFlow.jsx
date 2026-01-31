@@ -7,8 +7,6 @@ import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { QUESTION_BANK } from '@/data/questionBank';
 
-// may be buggy ||working on it||
-
 export const QuestionnaireFlow = ({ user, onComplete }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,9 +29,9 @@ export const QuestionnaireFlow = ({ user, onComplete }) => {
 
   const handleNext = useCallback(() => {
     if (!userData?.id) {
-  toast.error("User session missing. Please restart from login.");
-  return;
-}
+      toast.error("User session missing. Please restart from login.");
+      return;
+    }
 
     if (!selectedOption) {
       toast.error('Please select an option');
@@ -60,20 +58,20 @@ export const QuestionnaireFlow = ({ user, onComplete }) => {
       // All questions completed - save and process
       handleComplete(newResponses);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedOption, confidence, currentQuestionIndex, startTime, responses, userData, currentQuestion]);
 
   const handleComplete = async (allResponses) => {
     try {
       // Save signals to backend
-      const response = await fetch("https://pranjal01.app.n8n.cloud/webhook-test/adaptive-learning-webhook", { // ← PUT YOUR N8N WEBHOOK URL HERE
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(allResponses)
-    });
+      const response = await fetch("https://pranjal01.app.n8n.cloud/webhook-test/adaptive-learning-webhook", { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(allResponses)
+      });
 
-if (!response.ok) throw new Error('Failed to send data to webhook');
-;
+      if (!response.ok) throw new Error('Failed to send data to webhook');
+      ;
 
       toast.success('Assessment complete! Analyzing your trajectory...');
       onComplete();
@@ -82,11 +80,11 @@ if (!response.ok) throw new Error('Failed to send data to webhook');
       console.error('Error saving signals:', error);
       toast.error('Failed to save responses');
     }
-    
+
   };
 
   return (
-    <div 
+    <div
       data-testid="questionnaire-page"
       className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 p-4 md:p-8"
     >
@@ -116,11 +114,10 @@ if (!response.ok) throw new Error('Failed to send data to webhook');
                   key={idx}
                   data-testid={`option-${idx}`}
                   onClick={() => setSelectedOption(option.label)}
-                  className={`p-4 rounded-lg border-2 text-left transition-all ${
-                    selectedOption === option.label
+                  className={`p-4 rounded-lg border-2 text-left transition-all ${selectedOption === option.label
                       ? 'border-blue-500 bg-blue-50 shadow-md'
                       : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
-                  }`}
+                    }`}
                 >
                   <span className="text-base">{option.label}</span>
                 </button>

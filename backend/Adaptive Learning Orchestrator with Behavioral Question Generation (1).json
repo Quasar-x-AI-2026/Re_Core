@@ -1,0 +1,1806 @@
+{
+  "name": "Adaptive Learning Orchestrator with Behavioral Question Generation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "adaptive-learning-webhook",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "014db3eb-d731-4cdc-ad50-72e337d36c64",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -3488,
+        336
+      ],
+      "webhookId": "2993f7b5-ce8b-4842-b989-6a87fc8562ea"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.generated_at }}\nGenerate SINGLE BUT NEXT MICRO TOPIC question for an adaptive learning session.\nREAD CONVERSATION MEMORY and \n\nCONTEXT\n\nTopic: Chemical Reactions and Equations\n\nSubtopic: Types of reactions, oxidation and reduction\n\nQuestion Mode: Either\n\nCONCEPT (Convergent) or\n\nTHINKING (Divergent)\n(The mode will be specified before generation.)\n\nIMPORTANT: EPISTEMIC MODE RULE (CRITICAL)\n\nThis system alternates between two fundamentally different kinds of questions.\nYou MUST strictly follow the rules of the current mode.\n\n1. CONCEPT MODE — CONVERGENT\n\nIn Concept mode:\n\nThere is exactly ONE objectively correct answer\n\nAll competent learners should choose the same option\n\nAny other option must represent a misconception or incorrect reasoning\n\nCorrectness is absolute, not dependent on the learner\n\nThe question must collapse to one clear truth under correct reasoning\n\nDo NOT make the question subjective or open-ended.\n\n2. THINKING MODE — DIVERGENT\n\nIn Thinking mode:\n\nThere is NO single universally correct answer\n\nDifferent learners are expected to choose different options\n\nEach option must represent a valid, defensible way of thinking\n\nDifferences in answers are signals of thinking style, not mistakes\n\nDo NOT make one option clearly better than the others\n\nDo NOT ask what the learner prefers, likes, or would choose personally.\n\nABSOLUTE VIOLATIONS (NEVER DO THESE)\n\nDo NOT blur Concept and Thinking modes\n\nDo NOT make Thinking questions secretly convergent\n\nDo NOT make Concept questions subjective\n\nDo NOT ask preference-based questions\n\nDo NOT reveal or mention cognitive profiles or thinking styles\n\nIF THE MODE IS CONCEPT (CONVERGENT)\n\nDesign a question that tests whether the learner truly understands the mechanism behind chemical reactions.\n\nRequirements:\n\nExactly one correct answer\n\nBased on an observed reaction outcome or comparison\n\nThe correct answer must rely on the actual chemical process\n(e.g., oxidation, reduction, displacement, combination)\n\nAt least one wrong option must reflect a common misconception\n\nFocus on reaction type or electron transfer, not definitions\n\nProhibited:\n\nDefinition-only questions\n\nPure memorization\n\nNumerical or calculation problems\n\nExam-style or coaching language\n\nIntent:\n“Given what happens in a reaction, which explanation correctly describes the chemical process involved?”\n\nIF THE MODE IS THINKING (DIVERGENT)\n\nDesign a question that reveals how the learner reasons about chemical reactions.\n\nRequirements:\n\nAll options must be reasonable in isolation\n\nDifferent learners choosing different answers is intended\n\nThe scenario must include constraints or observations\n\nEach option should reflect a different reasoning approach, such as:\n\nFocusing on electron transfer\n\nFocusing on visible changes\n\nFocusing on reactant–product roles\n\nFocusing on reaction classification rules\n\nProhibited:\n\nAsking which method is “best”\n\nPreference or opinion-based language\n\nHidden correct answers\n\nIntent:\n“Given an observed reaction and constraints, which line of reasoning fits how the learner interprets the process?”\n\n\n\n\nUSER {{ $json.thinking_variables }}  WHICH DEFINES USER EDUCATIONAL THINKING PSYCHOLOGY, \nWITH{{ $json.dominant_patterns }} AND OTHER THINGS LIKE {{ $json.risk_flags }}{{ $json.interaction_history }}{{ $json.last_updated }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an expert diagnostic question designer.\n\nYour task is to generate high-constraint, process-diagnostic multiple-choice questions for chemistry, specifically:\n\nTopic: Chemical Reactions and Equations\n\nSubtopics: Types of reactions, oxidation–reduction\n\nYour questions must resemble mechanistic diagnostic probes, not textbook or exam questions.\n\nCORE DESIGN PHILOSOPHY (NON-NEGOTIABLE)\n\nEach question must:\n\nBe driven by an observed outcome, comparison, or anomaly\n\nForce the learner to reason about what can and cannot explain the observation\n\nPenalize single-factor, slogan-based reasoning\n\nReveal conceptual gaps or reasoning rigidity\n\nThese are not recall questions and not preference questions.\n\nQUESTION STYLE REQUIREMENTS (CRITICAL)\n\nAll questions must follow this pattern:\n\n“Given this observed reaction behavior under stated constraints,\nwhich explanation / inference / statement is invalid, must be false, or remains defensible?”\n\nThe question must:\n\nProvide just enough information\n\nWithhold unnecessary data\n\nForce elimination of incorrect causal explanations\n\nCONCEPTUAL TARGETS (CHEMICAL REACTIONS)\n\nQuestions must probe understanding of:\n\nReaction classification limits\n(Why some observations do not define reaction type)\n\nOxidation vs reduction mechanisms\n(Electron transfer vs oxygen/hydrogen heuristics)\n\nMisleading surface features\n(Color change, gas evolution, heat release)\n\nConstraint-based reasoning\n(What explanations fail once constraints are applied)\n\nOPTION DESIGN RULES (VERY IMPORTANT)\n\nEach option must represent a distinct explanatory move, such as:\n\nMechanistic (electron transfer, oxidation states)\n\nHeuristic but flawed (oxygen gain = oxidation)\n\nOvergeneralized rule (“all displacement reactions are redox”)\n\nIrrelevant factor (bond strength, reaction speed, appearance)\n\nAt least one option must be attractive but wrong.\n\nABSOLUTE PROHIBITIONS\n\nDo NOT generate:\n\nDefinition questions\n\n“Which reaction is…” classification drills\n\nPreference or strategy questions\n\nCalculation or balancing problems\n\n“Which principle explains…” wording\n\nPYQ / exam-coaching language\n\nDo NOT mention:\n\nCognitive profiles\n\nLearning styles\n\nThinking variables\n\nDifficulty level\n\nSTRUCTURAL TEMPLATE (DO NOT COPY VERBATIM)\n\nUse structures like:\n\n“Which explanation cannot account for this observation?”\n\n“Which statement must be false if this result is reliable?”\n\n“Which inference is safest given only this information?”\n\n“Which conclusion follows with the least additional assumptions?”\nPTION DESIGN ENFORCEMENT (CRITICAL)\n\nFor every question, the FOUR answer options MUST represent FOUR DISTINCT EXPLANATORY COMMITMENTS.\n\nEach option must clearly correspond to ONE of the following roles:\n\nMechanistic Commitment\n\nExplicitly refers to electron transfer, oxidation states, or redox causation\n\nMakes a concrete causal claim\n\nHeuristic Shortcut\n\nUses a common but unreliable rule (oxygen gain, hydrogen loss, visible change)\n\nAttractive but fails under the stated constraints\n\nOvergeneralized Rule\n\nApplies a rule that is sometimes true but invalid in this scenario\n\nExample: “All displacement reactions are oxidation–reduction”\n\nCausally Irrelevant Explanation\n\nRefers to energy change, reaction speed, appearance, or bond strength\n\nSounds scientific but does not explain the outcome\n\nMANDATORY CONSTRAINTS:\n\nNo two options may rely on the same reasoning variable\n\nEach option must EXCLUDE at least one other option’s logic\n\nIf two options could both be correct simultaneously, REWRITE THEM\n\nIf an option cannot be falsified by reasoning, REWRITE IT\n\nFAILURE CONDITIONS (DO NOT OUTPUT):\n\nVague restatements of the same idea\n\nPure descriptions without causal commitment\n\nOptions that differ only in wording, not logic.\n\nOUTPUT FORMAT (STRICT)\n\nOutput ONLY valid JSON:\n\n{\n  \"question\": \"Question text here\",\n  \"options\": {\n    \"A\": \"Option text\",\n    \"B\": \"Option text\",\n    \"C\": \"Option text\",\n    \"D\": \"Option text\"\n  }\n}\n\nAdditional constraints:\n\nQuestion must be self-contained\n\nEach option ≤ 15 words\n\nOptions must differ in reasoning, not wording\n\nNo explanations or answers\n\nQUALITY CHECK (INTERNAL — MUST PASS)\n\nBefore outputting, verify internally:\n\n❑ Could a student answer this by memorization alone? (If yes → reject)\n\n❑ Does the question test what cannot explain an outcome? (If no → revise)\n\n❑ Would a slogan-based learner fail? (If no → revise)\n\n❑ Does the question diagnose mechanism understanding? (If no → revise)\n\nOnly output after all checks pass.\n\n\n\ntake below as a standard to generate questions but do not write that exactly or do not take the below as a sub topic or topic\nTOPIC 1 — ALKANES: PHYSICAL PROPERTIES\n\nQ1\nTwo alkanes have identical molecular formulas and nearly identical molar masses. Repeated measurements show a 12 °C difference in boiling point. No other data are provided.\nWhich explanation cannot account for this observation?\nA. A difference in molecular shape affecting intermolecular contact B. A difference in covalent bond energies C. A difference in surface area available for dispersion forces D. A difference in branching pattern\nThis forces the student to know what boiling point depends on — and what it does not.\nQ2\nAn alkane has a higher boiling point than another alkane with greater molecular mass. Both are saturated hydrocarbons measured under identical conditions.\nWhich statement must be false if this observation is reliable?\nA. Molecular mass alone determines boiling point B. Dispersion forces depend on molecular shape C. Intermolecular attractions influence phase change D. Structural features affect physical properties\nQ3\nThree alkanes are compared. All have the same molecular formula. One is highly symmetrical, one moderately branched, one extended.\nOnly the melting point of the symmetrical alkane is anomalously high.\nWhich property is being selectively amplified?\nA. Solid-state packing efficiency B. Liquid-phase intermolecular attraction C. Covalent bond strength D. Chemical stability\nThis distinguishes melting vs boiling mechanisms without naming them.\nQ4\nAn alkane exhibits a normal boiling point but an unexpectedly high melting point. No hydrogen bonding or polarity differences are possible.\nWhich inference is most defensible?\nA. The solid phase permits unusually efficient molecular arrangement B. Intermolecular forces are uniformly stronger in all phases C. The molecule contains hidden functional groups D. Experimental error is the most likely cause\nQ5\nTwo alkanes show nearly identical boiling points but noticeably different melting points.\nWhich conclusion follows with the least additional assumptions?\nA. Packing constraints differ between the molecules B. Intermolecular forces differ substantially in the liquid C. Bond strengths differ D. Chemical reactivity differs\nQ6\nA student explains all boiling-point trends in alkanes using only molecular mass. This model succeeds for straight-chain alkanes but fails for branched isomers.\nWhat does this failure indicate?\nA. The model is incomplete, not useless B. Molecular mass is irrelevant C. Structural reasoning is unnecessary D. Measurement error dominates\nThis diagnoses epistemic flexibility vs absolutism.\nQ7\nAn alkane is insoluble in water. No temperature, pressure, or mixing limitations apply.\nWhich explanation survives elimination of irrelevant factors?\nA. Lack of favorable intermolecular interactions with water B. Strong internal covalent bonding C. Absence of polarity within the molecule D. High molecular mass\nOnly one explanation actually targets solubility mechanics.\nQ8\nAn alkane’s boiling point is higher than predicted by mass-based trends alone. No experimental anomalies are detected.\nWhich inference is logically safest?\nA. Structural features increase effective intermolecular attraction B. Carbon–carbon bonds are stronger C. The molecule is chemically more reactive D. The molecular formula is incorrect"
+        }
+      },
+      "id": "90be67e6-3ab2-408c-8309-19b6e0151305",
+      "name": "Question Generator Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -192,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=// In the Code Node - Modified version\nconst lstWebhook = $('LST').first().json;\nconst responses = lstWebhook.body;\nconst ltmProfile = $('LTM VAR').first().json;\n\nconst thinkingVars = JSON.parse(ltmProfile.thinking_variables);\nconst dominantPatterns = JSON.parse(ltmProfile.dominant_patterns);\nconst riskFlags = JSON.parse(ltmProfile.risk_flags);\n\nconst topic = \"Chemistry\";\nconst subtopic = \"Alkanes and Hydrocarbons\";\n\n// Create a SIMPLER prompt\nconst contextPrompt = `Analyze this learner's performance on ${subtopic}.\n\nCOGNITIVE PROFILE:\nStrong in: ${dominantPatterns.slice(0, 3).map(p => `${p.pattern} (${p.strength})`).join(', ')}\nWeak in: flexible_thinking (0.4), intuitive_reasoning (0.4), exploratory_tendency (0.4)\nRisk flags: ${riskFlags.map(r => `${r.flag} (${r.severity})`).join(', ')}\n\nKEY PROFILE SCORES:\n- Analytical thinking: ${thinkingVars.analytical_thinking}\n- Logical decision: ${thinkingVars.logical_decision}\n- Structured approach: ${thinkingVars.structured_approach}\n- Detail focus: ${thinkingVars.detail_focus}\n- Flexible thinking: ${thinkingVars.flexible_thinking}\n\nQUESTION PERFORMANCE (${responses.length} questions):\n${responses.map((item, idx) => {\n  const timeSpent = idx > 0 ? Math.round((new Date(item.timestamp) - new Date(responses[idx-1].timestamp)) / 1000) : 0;\n  return `Q${item.questionId}: \"${item.questionText.substring(0, 80)}...\" → Selected Option ${item.selectedOption} (${timeSpent}s)`;\n}).join('\\n')}\n\nAverage response time: ${Math.round(responses.reduce((acc, curr, idx) => {\n  if (idx === 0) return 0;\n  return acc + (new Date(curr.timestamp) - new Date(responses[idx-1].timestamp));\n}, 0) / 1000 / (responses.length - 1))}s per question\n\nTASK:\nGenerate four insights for ${subtopic}:\n\n1. current_thinking: How they currently approach ${subtopic} (cite specific questions showing strengths like logical analysis and structured approach, plus response patterns)\n\n2. directional_flaws: Topic-specific weaknesses (connect low flexible_thinking and risk flags to specific questions where they struggled or took too long)\n\n3. optimal_direction: Ideal cognitive framework for ${subtopic} mastery (balance of analytical reasoning, molecular visualization, structure-property thinking)\n\n4. adaptation_guidance: Actionable strategies leveraging their logical/structured strengths while addressing inflexibility and overanalysis tendencies\n\nOutput valid JSON only.`;\n\nreturn [{\n  json: {\n    user_id: ltmProfile.user_id,\n    topic: topic,\n    subtopic: subtopic,\n    contextPrompt: contextPrompt\n  }\n}];",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an Adaptive Learning Insight Generator. Your task is to analyze a learner's cognitive profile alongside their question responses to generate four comprehensive insights.\n\nOUTPUT REQUIREMENTS:\n- Return ONLY valid JSON with these exact fields:\n  * current_thinking (string, 2-3 paragraphs)\n  * directional_flaws (string, 2-3 paragraphs)\n  * optimal_direction (string, 2-3 paragraphs)\n  * adaptation_guidance (string, 3-4 paragraphs)\n\nWRITING STYLE:\n- Natural, academic tone (not clinical)\n- Reference specific questions and answers as evidence\n- Be supportive and constructive\n- Provide concrete, actionable advice\n- Never mention \"thinking variables\", \"cognitive scores\", or system mechanics\n\nANALYSIS APPROACH:\n1. Connect profile strengths/weaknesses to observed behaviors\n2. Identify patterns in response choices and timing\n3. Ground all insights in evidence from BOTH profile data and actual responses\n4. Be specific to the topic/subtopic, not generic"
+        }
+      },
+      "id": "1a6c597a-d452-4931-8db9-cbf3fb4747f9",
+      "name": "Insight Generator Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        976,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"question\": {\n      \"type\": \"string\",\n      \"description\": \"The question text\"\n    },\n    \"options\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"A\": {\"type\": \"string\"},\n        \"B\": {\"type\": \"string\"},\n        \"C\": {\"type\": \"string\"},\n        \"D\": {\"type\": \"string\"}\n      },\n      \"required\": [\"A\", \"B\", \"C\", \"D\"]\n    }\n  },\n  \"required\": [\"question\", \"options\"]\n}",
+        "autoFix": true
+      },
+      "id": "794925f5-962f-4781-b10a-4fa0d7b11c4a",
+      "name": "Question Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"current_thinking\": {\n      \"type\": \"string\",\n      \"description\": \"How the learner currently approaches problems\"\n    },\n    \"directional_flaws\": {\n      \"type\": \"string\",\n      \"description\": \"Topic-specific weaknesses in their approach\"\n    },\n    \"optimal_direction\": {\n      \"type\": \"string\",\n      \"description\": \"The ideal way of thinking for this topic\"\n    },\n    \"adaptation_guidance\": {\n      \"type\": \"string\",\n      \"description\": \"Actionable advice for improvement\"\n    }\n  },\n  \"required\": [\"current_thinking\", \"directional_flaws\", \"optimal_direction\", \"adaptation_guidance\"]\n}",
+        "autoFix": true
+      },
+      "id": "c25bab49-e2da-405b-b577-1fb5a544dbb8",
+      "name": "Insight Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        912,
+        576
+      ]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.user_id }}_{{ $json.generated_at }}{{ $json.thinking_variables }} "
+      },
+      "id": "03896426-5873-4073-bd20-06f42219a34d",
+      "name": "Conversation Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -192,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "25457a3d-6d99-48d8-8a90-0491d7b21fb4",
+      "name": "Return Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        320,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=`Analyze the following onboarding questionnaire responses and infer the learner's cognitive profile.\n\nUSER PROFILE:\n- User ID: ${$json.ondb[0].userId}\n- Total Questions: ${$json.ondb.length}\n- Total Time: ${$json.ondb.reduce((sum, q) => sum + q.timeSpentMs, 0)}ms\n\nDETAILED RESPONSE ANALYSIS:\n${$json.ondb.map((item, index) => `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nQUESTION ${index + 1}: ${item.questionId}\n\"${item.questionText}\"\n\nAvailable Options and Their Cognitive Mappings:\n${item.all_Options.map((opt, i) => {\n  const letter = String.fromCharCode(65 + i);\n  const mapping = Object.entries(opt.map).map(([key, val]) => `${key}:${val}`).join(', ');\n  return `  [${letter}] ${opt.label}\n      → Cognitive Map: {${mapping}}`;\n}).join('\\n')}\n\nUSER'S RESPONSE:\n✓ Selected: \"${item.selectedOption}\"\n✓ Confidence: ${item.confidence}/5\n✓ Time Taken: ${item.timeSpentMs}ms (${item.timeSpentMs < 2000 ? 'Quick' : item.timeSpentMs > 3000 ? 'Thoughtful' : 'Moderate'})\n${item.skipped ? '⚠ Status: SKIPPED' : ''}\n\nINFERENCE TASK:\nBased on the selected option's cognitive map, what does this reveal about:\n- Which thinking variables should be increased?\n- Which thinking variables should be decreased?\n- What behavioral patterns are emerging?\n`).join('\\n')}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nSYNTHESIS REQUIREMENTS:\n\n1. For EACH of the 35 thinking variables below, calculate a value between 0.0 and 1.0:\n   - analytical_thinking, intuitive_reasoning, sequential_processing, holistic_view\n   - logical_decision, emotional_awareness, abstract_preference, concrete_learning\n   - risk_tolerance, detail_focus, big_picture_view, structured_approach\n   - flexible_thinking, pattern_recognition, conceptual_depth, practical_application\n   - theoretical_understanding, exploratory_tendency, convergent_focus, metacognitive_awareness\n   - self_regulation, persistence, adaptability, curiosity_drive\n   - goal_orientation, social_learning, independent_learning, visual_processing\n   - verbal_processing, kinesthetic_preference, stress_resilience, ambiguity_tolerance\n   - feedback_receptivity, innovation_orientation, systematic_thinking\n\n2. Base your calculations on:\n   - The cognitive maps attached to selected options\n   - Response patterns across all 15 questions\n   - Behavioral signals (time spent, confidence levels)\n   - Cross-question consistency or contradictions\n\n3. Identify 3-5 DOMINANT PATTERNS with:\n   - Pattern name\n   - Strength score (0-1)\n   - Specific question evidence\n\n4. Identify RISK FLAGS (learning challenges) with:\n   - Flag description\n   - Severity (low/medium/high)\n   - Supporting evidence from responses\n\nGenerate a complete initial learner state. Be specific about which questions led to which variable values.`",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a Learner State Inference Engine specialized in psychometric analysis of learning behaviors.\n\nYour task is to analyze onboarding question responses and infer the learner's cognitive profile.\n\nFor each of the 15 questions provided:\n1. Understand what cognitive dimension the question targets\n2. Analyze what each option represents as a thinking pattern\n3. Interpret what the selected option reveals about the learner\n\nGenerate an initial learner state with:\n- thinking_variables: Object with 35 variables (0-1 scale) covering analytical_thinking, intuitive_reasoning, sequential_processing, holistic_view, logical_decision, emotional_awareness, abstract_preference, concrete_learning, risk_tolerance, detail_focus, big_picture_view, structured_approach, flexible_thinking, etc.\n- dominant_patterns: Array of top 3-5 strongest thinking patterns identified\n- confidence_profile: String describing overall confidence in the inference\n- risk_flags: Array of potential learning challenges or blind spots\n\nBe specific and evidence-based. Reference which questions led to which inferences.\n\nOutput ONLY valid JSON."
+        }
+      },
+      "id": "37f99130-fefa-440d-883f-c687d02b9dff",
+      "name": "Learner State Inference Engine",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1488,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"thinking_variables\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"analytical_thinking\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"intuitive_reasoning\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"sequential_processing\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"holistic_view\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"logical_decision\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"emotional_awareness\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"abstract_preference\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"concrete_learning\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"risk_tolerance\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"detail_focus\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"big_picture_view\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"structured_approach\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"flexible_thinking\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"pattern_recognition\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"conceptual_depth\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"practical_application\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"theoretical_understanding\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"exploratory_tendency\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"convergent_focus\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"metacognitive_awareness\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"self_regulation\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"persistence\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"adaptability\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"curiosity_drive\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"goal_orientation\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"social_learning\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"independent_learning\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"visual_processing\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"verbal_processing\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"kinesthetic_preference\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"stress_resilience\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"ambiguity_tolerance\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"feedback_receptivity\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"innovation_orientation\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n        \"systematic_thinking\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1}\n      },\n      \"required\": [\n        \"analytical_thinking\",\n        \"intuitive_reasoning\",\n        \"sequential_processing\",\n        \"holistic_view\",\n        \"logical_decision\",\n        \"emotional_awareness\",\n        \"abstract_preference\",\n        \"concrete_learning\",\n        \"risk_tolerance\",\n        \"detail_focus\",\n        \"big_picture_view\",\n        \"structured_approach\",\n        \"flexible_thinking\",\n        \"pattern_recognition\",\n        \"conceptual_depth\",\n        \"practical_application\",\n        \"theoretical_understanding\",\n        \"exploratory_tendency\",\n        \"convergent_focus\",\n        \"metacognitive_awareness\",\n        \"self_regulation\",\n        \"persistence\",\n        \"adaptability\",\n        \"curiosity_drive\",\n        \"goal_orientation\",\n        \"social_learning\",\n        \"independent_learning\",\n        \"visual_processing\",\n        \"verbal_processing\",\n        \"kinesthetic_preference\",\n        \"stress_resilience\",\n        \"ambiguity_tolerance\",\n        \"feedback_receptivity\",\n        \"innovation_orientation\",\n        \"systematic_thinking\"\n      ]\n    },\n    \"dominant_patterns\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"pattern\": {\"type\": \"string\"},\n          \"strength\": {\"type\": \"number\", \"minimum\": 0, \"maximum\": 1},\n          \"evidence\": {\n  \"type\": \"array\",\n  \"items\": { \"type\": \"string\" }\n}\n\n        },\n        \"required\": [\"pattern\", \"strength\", \"evidence\"]\n      }\n    },\n    \"confidence_profile\": {\"type\": \"string\"},\n    \"risk_flags\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"flag\": {\"type\": \"string\"},\n          \"severity\": {\"type\": \"string\", \"enum\": [\"low\", \"medium\", \"high\"]},\n          \"evidence\": {\"type\": \"string\"},\n          \"impact\": {\"type\": \"string\"}\n        },\n        \"required\": [\"flag\", \"severity\", \"evidence\"]\n      }\n    }\n  },\n  \"required\": [\"thinking_variables\", \"dominant_patterns\", \"confidence_profile\", \"risk_flags\"]\n}",
+        "autoFix": true
+      },
+      "id": "498f7f46-8a0d-4216-9eb2-3ba87a7516ae",
+      "name": "Learner State Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -1376,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -2064,
+        736
+      ],
+      "id": "daef9297-fb2b-45df-83e1-58c06fc7b1e5",
+      "name": "Groq Chat Model",
+      "retryOnFail": true,
+      "credentials": {
+        "groqApi": {
+          "id": "ws0aU8l4wl3DWbj1",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        560
+      ],
+      "id": "e6e1615d-0f06-4bf0-ac53-709123514052",
+      "name": "Groq Chat Model2",
+      "retryOnFail": true,
+      "credentials": {
+        "groqApi": {
+          "id": "ws0aU8l4wl3DWbj1",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      questions: [\n        {\n          id: \"Q1\",\n          text: \"When learning something new, what gives you the most satisfaction?\",\n          options: [\n            { label: \"Understanding why it works\", map: { depth: 2 } },\n            { label: \"Using it to solve real problems\", map: { application: 2 } },\n            { label: \"Exploring related ideas\", map: { exploration: 2 } },\n            { label: \"Finishing it efficiently\", map: { execution: 2 } }\n          ]\n        },\n        {\n          id: \"Q2\",\n          text: \"If a topic feels confusing, your first instinct is to:\",\n          options: [\n            { label: \"Re-study fundamentals\", map: { depth: 2 } },\n            { label: \"Ask someone or search guidance\", map: { support: 2 } },\n            { label: \"Try a different angle\", map: { exploration: 1.5 } },\n            { label: \"Move ahead and return later\", map: { avoidance: 1.5 } }\n          ]\n        },\n        {\n          id: \"Q3\",\n          text: \"Which describes your study pattern best?\",\n          options: [\n            { label: \"Very regular and planned\", map: { consistency: 2 } },\n            { label: \"Regular but flexible\", map: { consistency: 1.2 } },\n            { label: \"Irregular but intense\", map: { intensity: 1.2 } },\n            { label: \"Mostly deadline-driven\", map: { execution: 1.5 } }\n          ]\n        },\n        {\n          id: \"Q4\",\n          text: \"What usually motivates you to keep learning?\",\n          options: [\n            { label: \"Curiosity\", map: { intrinsic: 2 } },\n            { label: \"Future goals\", map: { goalOrientation: 2 } },\n            { label: \"External expectations\", map: { pressure: 1.5 } },\n            { label: \"Competition\", map: { competitiveness: 1.5 } }\n          ]\n        },\n        {\n          id: \"Q5\",\n          text: \"When choosing subjects or topics, you prefer:\",\n          options: [\n            { label: \"One clear direction\", map: { focus: 2 } },\n            { label: \"Few related options\", map: { focus: 1 } },\n            { label: \"Many unrelated interests\", map: { exploration: 2 } },\n            { label: \"Still unsure\", map: { uncertainty: 2 } }\n          ]\n        },\n        {\n          id: \"Q6\",\n          text: \"How do you react to difficult challenges?\",\n          options: [\n            { label: \"Persist patiently\", map: { resilience: 2 } },\n            { label: \"Seek help early\", map: { support: 1.5 } },\n            { label: \"Experiment until it works\", map: { exploration: 1.5 } },\n            { label: \"Feel stressed\", map: { stress: 2 } }\n          ]\n        },\n        {\n          id: \"Q7\",\n          text: \"Your learning speed is usually:\",\n          options: [\n            { label: \"Slow but solid\", map: { depth: 1.5 } },\n            { label: \"Moderate and steady\", map: { consistency: 1.5 } },\n            { label: \"Fast when interested\", map: { intensity: 1.5 } },\n            { label: \"Uneven\", map: { instability: 1.5 } }\n          ]\n        },\n        {\n          id: \"Q8\",\n          text: \"How often do you reflect on what you learned?\",\n          options: [\n            { label: \"Very often\", map: { reflection: 2 } },\n            { label: \"Sometimes\", map: { reflection: 1 } },\n            { label: \"Rarely\", map: { reflection: 0.5 } },\n            { label: \"Almost never\", map: { reflection: 0 } }\n          ]\n        },\n        {\n          id: \"Q9\",\n          text: \"Which environment suits you best?\",\n          options: [\n            { label: \"Structured and guided\", map: { structureNeed: 2 } },\n            { label: \"Semi-structured\", map: { structureNeed: 1 } },\n            { label: \"Independent\", map: { autonomy: 2 } },\n            { label: \"Flexible and open\", map: { autonomy: 1.5 } }\n          ]\n        },\n        {\n          id: \"Q10\",\n          text: \"When given freedom, you usually:\",\n          options: [\n            { label: \"Design your own plan\", map: { autonomy: 2 } },\n            { label: \"Follow examples\", map: { structureNeed: 1.5 } },\n            { label: \"Explore alternatives\", map: { exploration: 2 } },\n            { label: \"Delay decisions\", map: { uncertainty: 1.5 } }\n          ]\n        },\n        {\n          id: \"Q11\",\n          text: \"How do you feel about long-term goals?\",\n          options: [\n            { label: \"Very clear\", map: { goalOrientation: 2 } },\n            { label: \"Somewhat clear\", map: { goalOrientation: 1 } },\n            { label: \"Changing often\", map: { exploration: 1.5 } },\n            { label: \"Not sure yet\", map: { uncertainty: 2 } }\n          ]\n        },\n        {\n          id: \"Q12\",\n          text: \"What matters more to you right now?\",\n          options: [\n            { label: \"Skill mastery\", map: { depth: 1.5 } },\n            { label: \"Career alignment\", map: { goalOrientation: 1.5 } },\n            { label: \"Exploration\", map: { exploration: 2 } },\n            { label: \"Stability\", map: { structureNeed: 1.5 } }\n          ]\n        },\n        {\n          id: \"Q13\",\n          text: \"When feedback is given, you:\",\n          options: [\n            { label: \"Analyze it carefully\", map: { reflection: 1.5 } },\n            { label: \"Apply immediately\", map: { execution: 1.5 } },\n            { label: \"Compare alternatives\", map: { exploration: 1 } },\n            { label: \"Feel pressured\", map: { stress: 1.5 } }\n          ]\n        },\n        {\n          id: \"Q14\",\n          text: \"Your natural learning style feels closer to:\",\n          options: [\n            { label: \"Conceptual\", map: { depth: 2 } },\n            { label: \"Hands-on\", map: { application: 2 } },\n            { label: \"Exploratory\", map: { exploration: 2 } },\n            { label: \"Outcome-driven\", map: { execution: 2 } }\n          ]\n        },\n        {\n          id: \"Q15\",\n          text: \"If nothing restricted you, you would prefer to:\",\n          options: [\n            { label: \"Master one domain deeply\", map: { focus: 2 } },\n            { label: \"Blend multiple interests\", map: { exploration: 2 } },\n            { label: \"Follow opportunities\", map: { adaptability: 1.5 } },\n            { label: \"Keep options open\", map: { uncertainty: 1.5 } }\n          ]\n        }\n      ]\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3456,
+        800
+      ],
+      "id": "0ef06561-ac82-4bc7-836d-dc61fd880622",
+      "name": "QUESTION_BANK"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get data from both inputs\nconst webhookData = $input.first().json;\nconst questionBank = $('QUESTION_BANK').first().json;\n\n// Extract the answers array from webhook\n// The webhook data is nested in: body array\nconst answers = webhookData.body || webhookData;\n\n// Extract questions array\nconst questions = questionBank.questions || questionBank;\n\n// Merge each answer with its corresponding question\nconst mergedData = answers.map(answer => {\n  const question = questions.find(q => q.id === answer.questionId);\n  \n  return {\n    userId: answer.userId,\n    questionId: answer.questionId,\n    questionText: question?.text || 'Question not found',\n    selectedOption: answer.selectedOption,\n    all_Options: question?.options || [],\n    confidence: answer.confidence,\n    timeSpentMs: answer.timeSpentMs,\n    orderIndex: answer.orderIndex,\n    skipped: answer.skipped\n  };\n});\n\n// Return everything wrapped under \"ondb\"\nreturn [{\n  json: {\n    ondb: mergedData\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2464,
+        576
+      ],
+      "id": "12f34554-faff-469e-803c-0ba24bec2890",
+      "name": "merger001"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "8e140df6-bf01-4d0f-ba35-49d62c661e5a",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -768,
+        -288
+      ],
+      "id": "ff2ff686-68a6-4ca5-b81f-f95fbad25258",
+      "name": "TOPIC",
+      "webhookId": "8e140df6-bf01-4d0f-ba35-49d62c661e5a"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.user_id }}_{{ $json.generated_at }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        608,
+        800
+      ],
+      "id": "9b8b1efd-ff43-4688-a6df-b6aae5e39ab4",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        16,
+        528
+      ],
+      "id": "a7101ee8-5202-4451-99f5-92e64f559fb8",
+      "name": "Groq Chat Model4",
+      "retryOnFail": true,
+      "credentials": {
+        "groqApi": {
+          "id": "ws0aU8l4wl3DWbj1",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the AI output\nconst aiOutput = $json.output;\n\n// Option 1: Get from a specific previous node\n// const userId = $('YourNodeName').first().json.userId;\n\n// Option 2: Get from webhook data\n// const userId = $('Webhook Trigger').first().json.body[0].userId;\n\n// Option 3: For testing - hardcode it\nconst userId = 1;\n\n// Format for Data Table insertion\nreturn [{\n  json: {\n    user_id: userId,\n    profile_version: 0,\n    generated_at: new Date().toISOString(),\n   \n    thinking_variables: JSON.stringify(aiOutput.thinking_variables),\n    dominant_patterns: JSON.stringify(aiOutput.dominant_patterns),\n    confidence_profile: aiOutput.confidence_profile,\n    risk_flags: JSON.stringify(aiOutput.risk_flags),\n    interaction_history: JSON.stringify([]),\n    last_updated: new Date().toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -800,
+        16
+      ],
+      "id": "26305899-5d02-4702-b974-da67f4a75d94",
+      "name": "LTM VAR"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get data from both inputs\nconst topicData = $('TOPIC').first().json.body;\nconst ltmData = $('LTM VAR').first().json;\n\n// Parse the JSON strings from LTM VAR\nconst thinkingVariables = JSON.parse(ltmData.thinking_variables);\nconst dominantPatterns = JSON.parse(ltmData.dominant_patterns);\nconst riskFlags = JSON.parse(ltmData.risk_flags);\nconst interactionHistory = JSON.parse(ltmData.interaction_history);\n\n// Merge everything into a single object\nconst mergedData = {\n  // From TOPIC webhook\n  topic: topicData.Topic,\n  subtopic: topicData.Subtopic,\n  \n  // From LTM VAR (learner profile)\n  user_id: ltmData.user_id,\n  profile_version: ltmData.profile_version,\n  generated_at: ltmData.generated_at,\n  last_updated: ltmData.last_updated,\n  \n  // Parsed cognitive data\n  thinking_variables: thinkingVariables,\n  dominant_patterns: dominantPatterns,\n  confidence_profile: ltmData.confidence_profile,\n  risk_flags: riskFlags,\n  interaction_history: interactionHistory,\n  \n  // For question generation\n  questionNumber: 1 // First question\n};\n\n// Return merged data\nreturn [{ json: mergedData }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -368,
+        -96
+      ],
+      "id": "243f48c9-2d51-4f60-8f2d-445dcce2628e",
+      "name": "merger002"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "bb8a47b4-7198-438a-9e89-a1a7a276bc2d",
+        "responseMode": "streaming",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        576,
+        128
+      ],
+      "id": "4b579403-8005-4f9d-91a9-4d7256a40189",
+      "name": "LST",
+      "webhookId": "bb8a47b4-7198-438a-9e89-a1a7a276bc2d"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get LST webhook data\nconst lstWebhook = $('LST').first().json;\nconst responses = lstWebhook.body;\n\n// Get LTM VAR profile data\nconst ltmProfile = $('LTM VAR').first().json;\n\n// Parse the JSON strings from the profile\nconst thinkingVars = JSON.parse(ltmProfile.thinking_variables);\nconst dominantPatterns = JSON.parse(ltmProfile.dominant_patterns);\nconst riskFlags = JSON.parse(ltmProfile.risk_flags);\nconst interactionHistory = JSON.parse(ltmProfile.interaction_history);\n\n// Extract topic/subtopic (if you have it in the webhook, otherwise set defaults)\n// Assuming you'll add topic/subtopic to webhook later\nconst topic = responses[0]?.topic || \"Chemistry\";\nconst subtopic = responses[0]?.subtopic || \"Alkanes and Hydrocarbons\";\n\n// Build the aggregated context prompt\nconst contextPrompt = `Generate comprehensive learning insights for this learner.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nLEARNER CONTEXT\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nUser ID: ${ltmProfile.user_id}\nTopic: ${topic}\nSubtopic: ${subtopic}\nProfile Version: ${ltmProfile.profile_version}\nAssessment Date: ${ltmProfile.generated_at}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nCOGNITIVE PROFILE (from onboarding assessment)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nTHINKING VARIABLES (0-1 scale):\n${JSON.stringify(thinkingVars, null, 2)}\n\nDOMINANT LEARNING PATTERNS:\n${dominantPatterns.map(p => `• ${p.pattern} (strength: ${p.strength})\n  Evidence: ${p.evidence.join(', ')}`).join('\\n')}\n\nIDENTIFIED RISK FLAGS:\n${riskFlags.map(r => `⚠️ ${r.flag} (${r.severity} severity)\n  Evidence: ${r.evidence}`).join('\\n')}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nTOPIC-SPECIFIC QUESTION RESPONSES (LST Assessment)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nTotal Questions Answered: ${responses.length}\nAssessment Completed: ${responses[responses.length - 1].timestamp}\n\n${responses.map((item, index) => {\n  const timeSpent = index > 0 ? \n    new Date(item.timestamp) - new Date(responses[index - 1].timestamp) : \n    null;\n  \n  return `\nQUESTION ${item.questionId}:\n\"${item.questionText}\"\n\nLearner's Response: Option ${item.selectedOption}\nTimestamp: ${item.timestamp}\n${timeSpent ? `Time Spent: ~${Math.round(timeSpent / 1000)} seconds` : 'First question'}\n${index === 0 ? 'Response Speed: Baseline' : \n  timeSpent < 3000 ? 'Response Speed: Quick (< 3s)' : \n  timeSpent > 10000 ? 'Response Speed: Thoughtful (> 10s)' : \n  'Response Speed: Moderate (3-10s)'}\n`;\n}).join('\\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\n')}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nSYNTHESIS ANALYSIS\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nPROFILE-BEHAVIOR ALIGNMENT:\n- Analytical Thinking Score: ${thinkingVars.analytical_thinking} → The questions about boiling points and molecular structure require analytical reasoning. Do their response patterns (especially Questions 1, 2, 6) align with this score?\n- Logical Decision Score: ${thinkingVars.logical_decision} → Questions 4 and 8 demand logical elimination. Did their choices demonstrate this capacity?\n- Detail Focus Score: ${thinkingVars.detail_focus} → Questions 3 and 5 hinge on subtle distinctions. Do their selections show attention to detail?\n- Structured Approach Score: ${thinkingVars.structured_approach} → Question 6 explicitly tests systematic thinking about model limitations. Does their answer reflect this?\n\nRISK FLAG MANIFESTATIONS:\n${riskFlags.map(r => `• ${r.flag}: Did this manifest in their ${subtopic} responses? (e.g., over-analysis might show in hesitation patterns or overthinking simple questions)`).join('\\n')}\n\nRESPONSE PATTERN OBSERVATIONS:\n- Total response time: ${responses.reduce((acc, curr, idx) => {\n  if (idx === 0) return 0;\n  return acc + (new Date(curr.timestamp) - new Date(responses[idx-1].timestamp));\n}, 0) / 1000} seconds\n- Average time per question: ${(responses.reduce((acc, curr, idx) => {\n  if (idx === 0) return 0;\n  return acc + (new Date(curr.timestamp) - new Date(responses[idx-1].timestamp));\n}, 0) / 1000 / (responses.length - 1)).toFixed(1)} seconds\n- Consistency: Note if response times varied dramatically (could indicate uncertainty on specific questions)\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nINSIGHT GENERATION TASK\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nSynthesize the learner's cognitive profile with their actual question responses on ${subtopic} to generate four comprehensive insights:\n\n**1. CURRENT THINKING STYLE**\nHow does this learner currently approach ${subtopic} based on:\n- Their cognitive profile (especially high scores in analytical_thinking, logical_decision, structured_approach)\n- Their actual answer patterns (did they demonstrate these strengths?)\n- Response time patterns (quick vs. thoughtful responses)\n- Alignment or misalignment between profile and behavior\n\nBe specific: \"In Question X, you selected option Y, which shows...\"\n\n**2. DIRECTIONAL FLAWS (Topic-Specific to ${subtopic})**\nWhat weaknesses emerged specifically for ${subtopic}:\n- Which low-scoring cognitive variables proved problematic? (e.g., low flexible_thinking = struggle with non-standard scenarios)\n- Did risk flags like \"${riskFlags[0]?.flag}\" manifest in their answers?\n- Which questions revealed gaps in understanding molecular interactions, structure-property relationships, or reasoning about physical properties?\n- Where did their cognitive profile fail to support the task demands?\n\nCite specific questions: \"Question 7 about water solubility revealed...\"\n\n**3. OPTIMAL DIRECTION FOR ${subtopic}**\nWhat is the ideal cognitive framework for mastering ${subtopic}:\n- Balance between analytical reasoning and conceptual understanding\n- Importance of molecular visualization and structure-property thinking\n- Need to distinguish between correlation and causation in physical properties\n- Critical thinking about experimental limitations and anomalies\n- Integration of multiple factors (molecular mass, branching, symmetry, intermolecular forces)\n\nDescribe the expert mindset for this specific topic.\n\n**4. ADAPTATION GUIDANCE (Actionable & Personalized)**\nConcrete strategies tailored to their profile and demonstrated behaviors:\n- Leverage their strengths: High ${dominantPatterns[0]?.pattern} (${dominantPatterns[0]?.strength}) and ${dominantPatterns[1]?.pattern} (${dominantPatterns[1]?.strength})\n- Address their weaknesses: Low ${Object.entries(thinkingVars).sort((a,b) => a[1] - b[1])[0][0]} (${Object.entries(thinkingVars).sort((a,b) => a[1] - b[1])[0][1]})\n- Mitigate risk flags: ${riskFlags.map(r => r.flag).join(', ')}\n- Study techniques aligned with structured_approach preference\n- Practice areas: Focus on questions like X and Y where they struggled\n- Next topics to explore within ${topic}\n\nBe specific and actionable: \"When approaching alkane problems, first do X, then Y...\"\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nCRITICAL CONSTRAINTS\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n✓ Reference SPECIFIC questions and answers from the assessment\n✓ Connect cognitive profile scores to observed behaviors\n✓ Ground all insights in evidence from BOTH profile and responses\n✓ Use natural language—avoid phrases like \"your analytical_thinking score of 0.7\"\n✓ Be supportive and constructive, not judgmental\n✓ Provide actionable advice specific to ${subtopic}, not generic study tips\n\n✗ Do NOT mention \"thinking variables\", \"profile scores\", or \"cognitive metrics\" explicitly\n✗ Do NOT ignore the question responses—they are the primary evidence\n✗ Do NOT be vague or generic\n✗ Do NOT explain the assessment system mechanics\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nOUTPUT FORMAT (JSON ONLY)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n{\n  \"current_thinking\": \"2-3 paragraphs describing their approach to ${subtopic} with specific evidence from questions\",\n  \n  \"directional_flaws\": \"2-3 paragraphs identifying weaknesses in ${subtopic} understanding, citing specific questions\",\n  \n  \"optimal_direction\": \"2-3 paragraphs describing ideal cognitive approach for ${subtopic} mastery\",\n  \n  \"adaptation_guidance\": \"3-4 paragraphs with concrete, actionable strategies tailored to their profile and question performance\"\n}\n\nGenerate the insights now.`;\n\n// Return the aggregated signal\nreturn [{\n  json: {\n    user_id: ltmProfile.user_id,\n    topic: topic,\n    subtopic: subtopic,\n    profile_version: ltmProfile.profile_version,\n    \n    // Include parsed profile data for potential later use\n    thinking_variables: thinkingVars,\n    dominant_patterns: dominantPatterns,\n    risk_flags: riskFlags,\n    \n    // Include response data\n    total_questions: responses.length,\n    responses: responses,\n    \n    // The complete context prompt for the AI\n    contextPrompt: contextPrompt\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        16
+      ],
+      "id": "4c100bb7-aeab-454b-a48d-a574f03739d2",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "40e218dc-ebc2-4bb9-9ef5-95df5f4e82dd",
+      "name": "Return Response1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1504,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        832,
+        800
+      ],
+      "id": "cab88f53-8bd4-47e3-abef-3d625c04edf9",
+      "name": "Groq Chat Model5",
+      "retryOnFail": true,
+      "credentials": {
+        "groqApi": {
+          "id": "ws0aU8l4wl3DWbj1",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1552,
+        1456
+      ],
+      "id": "c352c803-db28-4abf-aff6-69cce7f6a2dd",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "LEARNER PROFILE 001",
+        "columns": {
+          "column": [
+            {
+              "name": "user_id",
+              "type": "number"
+            },
+            {
+              "name": "profile_version",
+              "type": "number"
+            },
+            {
+              "name": "generated_at"
+            },
+            {
+              "name": "topic"
+            },
+            {
+              "name": "subtopic"
+            },
+            {
+              "name": "thinking_variables"
+            },
+            {
+              "name": "dominant_patterns"
+            },
+            {
+              "name": "confidence_profile"
+            },
+            {
+              "name": "risk_flags"
+            },
+            {
+              "name": "interaction_history"
+            },
+            {
+              "name": "last_updated"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        528,
+        -976
+      ],
+      "id": "d516f915-e34f-474e-8a21-7f5be84cd24f",
+      "name": "Create a data table"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "58b79868-20cb-416a-80df-df5d3788299e",
+              "name": "ONDB INPUT EXTRACTION",
+              "value": "=You are given two inputs:  1) QUESTION BANK   Each question contains: - id - text - options (each option has a label and a map object)  2) USER RESPONSE DATA   Each entry contains: - questionId - selectedOption - confidence  Your task is to merge them into a single JSON array where each object represents one question and includes:  - questionId - questionText - options (full list from question bank) - selectedOption (from user input) - confidence (from user input)  Match questions using: question.id === userResponse.questionId  If a question has no matching response, set: \"selectedOption\": null   \"confidence\": null  Return ONLY this JSON array.  QUESTION BANK: {{ $json.questionBank }}  USER RESPONSES: {{ $json.responses }}\n\n\nfinal merged JSON format for each question \n[\n  {\n    \"id\": \"string\",\n    \"text\": \"string\",\n    \"options\": [\n      { \"label\": \"string\", \"map\": { \"trait\": number } }\n    ],\n    \"selectedOption\": {\n      \"label\": \"string\",\n      \"map\": { \"trait\": number }\n    },\n    \"confidence\": number | null\n  }\n]\n\n\n\nbut to done in single long JSON array\n\n\n\n\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2f190993-3a0d-492b-897e-232683955440",
+      "name": "Extract Onboarding Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2736,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"id\": \"Q14\",\n  \"text\": \"Your natural learning style feels closer to:\",\n  \"options\": [\n    { \"label\": \"Conceptual\", \"map\": { \"depth\": 2 } },\n    { \"label\": \"Hands-on\", \"map\": { \"application\": 2 } },\n    { \"label\": \"Exploratory\", \"map\": { \"exploration\": 2 } },\n    { \"label\": \"Outcome-driven\", \"map\": { \"execution\": 2 } }\n  ],\n  \"selectedOption\": {\n    \"label\": \"Hands-on\",\n    \"map\": { \"application\": 2 }\n  },\n  \"confidence\": 5\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -1584,
+        1472
+      ],
+      "id": "d0b9ccbd-2cd3-4c21-8183-85dc19a2aed6",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1TKYuh4UTJsrgwyI45cwMZWWR2rC8sP_9qBSfOBUITcY",
+          "mode": "list",
+          "cachedResultName": "ONBOARDING INPUTS",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TKYuh4UTJsrgwyI45cwMZWWR2rC8sP_9qBSfOBUITcY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TKYuh4UTJsrgwyI45cwMZWWR2rC8sP_9qBSfOBUITcY/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1568,
+        1472
+      ],
+      "id": "3dac014b-ed21-4edc-ac96-82549fff1b68",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "UsL4TWLCb8mIT9w3",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -1536,
+        1488
+      ],
+      "id": "01c25318-cd35-4273-89e1-539d96c86791",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1552,
+        1472
+      ],
+      "id": "7a07d116-106b-4f5e-8415-9a3f17c6e662",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        816
+      ],
+      "id": "f2d641a2-0e27-429a-aef3-c0347a90431c",
+      "name": "Groq Chat Model1",
+      "retryOnFail": true,
+      "credentials": {
+        "groqApi": {
+          "id": "ws0aU8l4wl3DWbj1",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "options": {}
+      },
+      "id": "3d9390b6-3641-40be-87c2-bd4cdb590018",
+      "name": "Store Learner State (Profile 0)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1584,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "b908e231-6ce2-473e-a2b7-7cf588ec07a3",
+      "name": "Merge Profile with Session Context",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1568,
+        1472
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.mode }}",
+                    "rightValue": "onboarding",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "83f2b672-27e5-43cc-bdb7-9b060fd5cfe8"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Onboarding Complete"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.mode }}",
+                    "rightValue": "insight",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "db013c17-8318-4584-a3a4-fa68f311907c"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Final Insight"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.mode }}",
+                    "rightValue": "question",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "92225bcf-b205-43bc-b40c-cc958366a0b3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Question Generation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a5b40f65-202b-4983-abd9-b34d646486ed",
+      "name": "Route by Operation Type",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -1584,
+        1456
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "contextPrompt",
+              "value": "={{ `You are generating final insights for the learner after completing a session.\n\nSession Context:\n- User ID: ${$('Extract Onboarding Data').item.json.user_id}\n- Topic: ${$('Extract Onboarding Data').item.json.topic}\n- Subtopic: ${$('Extract Onboarding Data').item.json.subtopic}\n\nLearner's Current Thinking State:\n${JSON.stringify($('Extract Onboarding Data').item.json.thinking_variables || {}, null, 2)}\n\nComplete Interaction History:\n${JSON.stringify($('Extract Onboarding Data').item.json.interaction_history || [], null, 2)}\n\nGenerate a structured insight with four sections:\n1. current_thinking: How the learner currently approaches problems in this topic\n2. directional_flaws: Topic-specific weaknesses or blind spots in their approach\n3. optimal_direction: The ideal way of thinking for this topic\n4. adaptation_guidance: Actionable advice on how to adapt without changing their natural style\n\nBe specific to the topic and subtopic. Reference patterns observed in their question responses.` }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3b55fc73-bc73-41f2-98e7-e8de66539f4b",
+      "name": "Prepare Insight Context",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1568,
+        1472
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "aa48fa28-ced9-48e1-87e3-20a00a9f63d1",
+      "name": "Prepare Onboarding Context",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1568,
+        1472
+      ]
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        688,
+        448
+      ],
+      "id": "61e0a834-2d7e-46f7-a7a0-b338eeed2aee",
+      "name": "Groq Chat Model6",
+      "retryOnFail": true,
+      "credentials": {
+        "groqApi": {
+          "id": "ws0aU8l4wl3DWbj1",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1504,
+        608
+      ],
+      "id": "33213f13-9092-4433-ae0b-fec5c7143edb",
+      "name": "Groq Chat Model3",
+      "credentials": {
+        "groqApi": {
+          "id": "ws0aU8l4wl3DWbj1",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "QUESTION_BANK": [
+      {
+        "json": {
+          "questions": [
+            {
+              "id": "Q1",
+              "text": "When learning something new, what gives you the most satisfaction?",
+              "options": [
+                {
+                  "label": "Understanding why it works",
+                  "map": {
+                    "depth": 2
+                  }
+                },
+                {
+                  "label": "Using it to solve real problems",
+                  "map": {
+                    "application": 2
+                  }
+                },
+                {
+                  "label": "Exploring related ideas",
+                  "map": {
+                    "exploration": 2
+                  }
+                },
+                {
+                  "label": "Finishing it efficiently",
+                  "map": {
+                    "execution": 2
+                  }
+                }
+              ]
+            },
+            {
+              "id": "Q2",
+              "text": "If a topic feels confusing, your first instinct is to:",
+              "options": [
+                {
+                  "label": "Re-study fundamentals",
+                  "map": {
+                    "depth": 2
+                  }
+                },
+                {
+                  "label": "Ask someone or search guidance",
+                  "map": {
+                    "support": 2
+                  }
+                },
+                {
+                  "label": "Try a different angle",
+                  "map": {
+                    "exploration": 1.5
+                  }
+                },
+                {
+                  "label": "Move ahead and return later",
+                  "map": {
+                    "avoidance": 1.5
+                  }
+                }
+              ]
+            },
+            {
+              "id": "Q3",
+              "text": "Which describes your study pattern best?",
+              "options": [
+                {
+                  "label": "Very regular and planned",
+                  "map": {
+                    "consistency": 2
+                  }
+                },
+                {
+                  "label": "Regular but flexible",
+                  "map": {
+                    "consistency": 1.2
+                  }
+                },
+                {
+                  "label": "Irregular but intense",
+                  "map": {
+                    "intensity": 1.2
+                  }
+                },
+                {
+                  "label": "Mostly deadline-driven",
+                  "map": {
+                    "execution": 1.5
+                  }
+                }
+              ]
+            },
+            {
+              "id": "Q4",
+              "text": "What usually motivates you to keep learning?",
+              "options": [
+                {
+                  "label": "Curiosity",
+                  "map": {
+                    "intrinsic": 2
+                  }
+                },
+                {
+                  "label": "Future goals",
+                  "map": {
+                    "goalOrientation": 2
+                  }
+                },
+                {
+                  "label": "External expectations",
+                  "map": {
+                    "pressure": 1.5
+                  }
+                },
+                {
+                  "label": "Competition",
+                  "map": {
+                    "competitiveness": 1.5
+                  }
+                }
+              ]
+            },
+            {
+              "id": "Q5",
+              "text": "When choosing subjects or topics, you prefer:",
+              "options": [
+                {
+                  "label": "One clear direction",
+                  "map": {
+                    "focus": 2
+                  }
+                },
+                {
+                  "label": "Few related options",
+                  "map": {
+                    "focus": 1
+                  }
+                },
+                {
+                  "label": "Many unrelated interests",
+                  "map": {
+                    "exploration": 2
+                  }
+                },
+                {
+                  "label": "Still unsure",
+                  "map": {
+                    "uncertainty": 2
+                  }
+                }
+              ]
+            },
+            {
+              "id": "Q6",
+              "text": "How do you react to difficult challenges?",
+              "options": [
+                {
+                  "label": "Persist patiently",
+                  "map": {
+                    "resilience": 2
+                  }
+                },
+                {
+                  "label": "Seek help early",
+                  "map": {
+                    "support": 1.5
+                  }
+                },
+                {
+                  "label": "Experiment until it works",
+                  "map": {
+                    "exploration": 1.5
+                  }
+                },
+                {
+                  "label": "Feel stressed",
+                  "map": {
+                    "stress": 2
+                  }
+                }
+              ]
+            },
+            {
+              "id": "Q7",
+              "text": "Your learning speed is usually:",
+              "options": [
+                {
+                  "label": "Slow but solid",
+                  "map": {
+                    "depth": 1.5
+                  }
+                },
+                {
+                  "label": "Moderate and steady",
+                  "map": {
+                    "consistency": 1.5
+                  }
+                },
+                {
+                  "label": "Fast when interested",
+                  "map": {
+                    "intensity": 1.5
+                  }
+                },
+                {
+                  "label": "Uneven",
+                  "map": {
+                    "instability": 1.5
+                  }
+                }
+              ]
+            },
+            {
+              "id": "Q8",
+              "text": "How often do you reflect on what you learned?",
+              "options": [
+                {
+                  "label": "Very often",
+                  "map": {
+                    "reflection": 2
+                  }
+                },
+                {
+                  "label": "Sometimes",
+                  "map": {
+                    "reflection": 1
+                  }
+                },
+                {
+                  "label": "Rarely",
+                  "map": {
+                    "reflection": 0.5
+                  }
+                },
+                {
+                  "label": "Almost never",
+                  "map": {
+                    "reflection": 0
+                  }
+                }
+              ]
+            },
+            {
+              "id": "Q9",
+              "text": "Which environment suits you best?",
+              "options": [
+                {
+                  "label": "Structured and guided",
+                  "map": {
+                    "structureNeed": 2
+                  }
+                },
+                {
+                  "label": "Semi-structured",
+                  "map": {
+                    "structureNeed": 1
+                  }
+                },
+                {
+                  "label": "Independent",
+                  "map": {
+                    "autonomy": 2
+                  }
+                },
+                {
+                  "label": "Flexible and open",
+                  "map": {
+                    "autonomy": 1.5
+                  }
+                }
+              ]
+            },
+            {
+              "id": "Q10",
+              "text": "When given freedom, you usually:",
+              "options": [
+                {
+                  "label": "Design your own plan",
+                  "map": {
+                    "autonomy": 2
+                  }
+                },
+                {
+                  "label": "Follow examples",
+                  "map": {
+                    "structureNeed": 1.5
+                  }
+                },
+                {
+                  "label": "Explore alternatives",
+                  "map": {
+                    "exploration": 2
+                  }
+                },
+                {
+                  "label": "Delay decisions",
+                  "map": {
+                    "uncertainty": 1.5
+                  }
+                }
+              ]
+            },
+            {
+              "id": "Q11",
+              "text": "How do you feel about long-term goals?",
+              "options": [
+                {
+                  "label": "Very clear",
+                  "map": {
+                    "goalOrientation": 2
+                  }
+                },
+                {
+                  "label": "Somewhat clear",
+                  "map": {
+                    "goalOrientation": 1
+                  }
+                },
+                {
+                  "label": "Changing often",
+                  "map": {
+                    "exploration": 1.5
+                  }
+                },
+                {
+                  "label": "Not sure yet",
+                  "map": {
+                    "uncertainty": 2
+                  }
+                }
+              ]
+            },
+            {
+              "id": "Q12",
+              "text": "What matters more to you right now?",
+              "options": [
+                {
+                  "label": "Skill mastery",
+                  "map": {
+                    "depth": 1.5
+                  }
+                },
+                {
+                  "label": "Career alignment",
+                  "map": {
+                    "goalOrientation": 1.5
+                  }
+                },
+                {
+                  "label": "Exploration",
+                  "map": {
+                    "exploration": 2
+                  }
+                },
+                {
+                  "label": "Stability",
+                  "map": {
+                    "structureNeed": 1.5
+                  }
+                }
+              ]
+            },
+            {
+              "id": "Q13",
+              "text": "When feedback is given, you:",
+              "options": [
+                {
+                  "label": "Analyze it carefully",
+                  "map": {
+                    "reflection": 1.5
+                  }
+                },
+                {
+                  "label": "Apply immediately",
+                  "map": {
+                    "execution": 1.5
+                  }
+                },
+                {
+                  "label": "Compare alternatives",
+                  "map": {
+                    "exploration": 1
+                  }
+                },
+                {
+                  "label": "Feel pressured",
+                  "map": {
+                    "stress": 1.5
+                  }
+                }
+              ]
+            },
+            {
+              "id": "Q14",
+              "text": "Your natural learning style feels closer to:",
+              "options": [
+                {
+                  "label": "Conceptual",
+                  "map": {
+                    "depth": 2
+                  }
+                },
+                {
+                  "label": "Hands-on",
+                  "map": {
+                    "application": 2
+                  }
+                },
+                {
+                  "label": "Exploratory",
+                  "map": {
+                    "exploration": 2
+                  }
+                },
+                {
+                  "label": "Outcome-driven",
+                  "map": {
+                    "execution": 2
+                  }
+                }
+              ]
+            },
+            {
+              "id": "Q15",
+              "text": "If nothing restricted you, you would prefer to:",
+              "options": [
+                {
+                  "label": "Master one domain deeply",
+                  "map": {
+                    "focus": 2
+                  }
+                },
+                {
+                  "label": "Blend multiple interests",
+                  "map": {
+                    "exploration": 2
+                  }
+                },
+                {
+                  "label": "Follow opportunities",
+                  "map": {
+                    "adaptability": 1.5
+                  }
+                },
+                {
+                  "label": "Keep options open",
+                  "map": {
+                    "uncertainty": 1.5
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "LTM VAR": [
+      {
+        "json": {
+          "user_id": 1,
+          "profile_version": 0,
+          "generated_at": "2026-01-31T03:36:18.688Z",
+          "thinking_variables": "{\"analytical_thinking\":0.7,\"intuitive_reasoning\":0.4,\"sequential_processing\":0.6,\"holistic_view\":0.5,\"logical_decision\":0.8,\"emotional_awareness\":0.3,\"abstract_preference\":0.6,\"concrete_learning\":0.4,\"risk_tolerance\":0.5,\"detail_focus\":0.7,\"big_picture_view\":0.6,\"structured_approach\":0.8,\"flexible_thinking\":0.4,\"pattern_recognition\":0.6,\"conceptual_depth\":0.5,\"practical_application\":0.7,\"theoretical_understanding\":0.6,\"exploratory_tendency\":0.4,\"convergent_focus\":0.7,\"metacognitive_awareness\":0.5,\"self_regulation\":0.6,\"persistence\":0.7,\"adaptability\":0.5,\"curiosity_drive\":0.6,\"goal_orientation\":0.7,\"social_learning\":0.4,\"independent_learning\":0.6,\"visual_processing\":0.5,\"verbal_processing\":0.6,\"kinesthetic_preference\":0.4,\"stress_resilience\":0.6,\"ambiguity_tolerance\":0.5,\"feedback_receptivity\":0.7,\"innovation_orientation\":0.5,\"systematic_thinking\":0.6}",
+          "dominant_patterns": "[{\"pattern\":\"logical_analysis\",\"strength\":0.8,\"evidence\":[\"Question 1\",\"Question 5\",\"Question 10\"]},{\"pattern\":\"structured_approach\",\"strength\":0.7,\"evidence\":[\"Question 3\",\"Question 7\",\"Question 12\"]},{\"pattern\":\"detail_focus\",\"strength\":0.6,\"evidence\":[\"Question 2\",\"Question 6\",\"Question 9\"]},{\"pattern\":\"convergent_focus\",\"strength\":0.6,\"evidence\":[\"Question 4\",\"Question 8\",\"Question 11\"]},{\"pattern\":\"practical_application\",\"strength\":0.5,\"evidence\":[\"Question 13\",\"Question 14\",\"Question 15\"]}]",
+          "confidence_profile": "Moderate",
+          "risk_flags": "[{\"flag\":\"over_analysis\",\"severity\":\"medium\",\"evidence\":\"Questions 1, 5, and 10 show a tendency to overanalyze information\"},{\"flag\":\"inflexibility\",\"severity\":\"low\",\"evidence\":\"Questions 3 and 7 indicate a preference for structured approaches, which may limit flexibility\"}]",
+          "interaction_history": "[]",
+          "last_updated": "2026-01-31T03:36:18.689Z"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Webhook Trigger": [
+      {
+        "json": {
+          "headers": {
+            "host": "pranjal01.app.n8n.cloud",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+            "content-length": "1977",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "117.254.129.134",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "IN",
+            "cf-ray": "9c6696d737a3897b-MAA",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "origin": "http://localhost:3000",
+            "priority": "u=1, i",
+            "referer": "http://localhost:3000/",
+            "sec-ch-ua": "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "x-forwarded-for": "117.254.129.134, 172.69.129.187",
+            "x-forwarded-host": "pranjal01.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-27-56cf765df-f6crp",
+            "x-is-trusted": "yes",
+            "x-real-ip": "117.254.129.134"
+          },
+          "params": {},
+          "query": {},
+          "body": [
+            {
+              "userId": 1,
+              "questionId": "Q1",
+              "selectedOption": "Exploring related ideas",
+              "confidence": 10,
+              "timeSpentMs": 5622,
+              "orderIndex": 0,
+              "skipped": false
+            },
+            {
+              "userId": 1,
+              "questionId": "Q2",
+              "selectedOption": "Move ahead and return later",
+              "confidence": 5,
+              "timeSpentMs": 2744,
+              "orderIndex": 1,
+              "skipped": false
+            },
+            {
+              "userId": 1,
+              "questionId": "Q3",
+              "selectedOption": "Mostly deadline-driven",
+              "confidence": 5,
+              "timeSpentMs": 2824,
+              "orderIndex": 2,
+              "skipped": false
+            },
+            {
+              "userId": 1,
+              "questionId": "Q4",
+              "selectedOption": "Competition",
+              "confidence": 5,
+              "timeSpentMs": 2039,
+              "orderIndex": 3,
+              "skipped": false
+            },
+            {
+              "userId": 1,
+              "questionId": "Q5",
+              "selectedOption": "Still unsure",
+              "confidence": 5,
+              "timeSpentMs": 1840,
+              "orderIndex": 4,
+              "skipped": false
+            },
+            {
+              "userId": 1,
+              "questionId": "Q6",
+              "selectedOption": "Feel stressed",
+              "confidence": 5,
+              "timeSpentMs": 2298,
+              "orderIndex": 5,
+              "skipped": false
+            },
+            {
+              "userId": 1,
+              "questionId": "Q7",
+              "selectedOption": "Uneven",
+              "confidence": 5,
+              "timeSpentMs": 2203,
+              "orderIndex": 6,
+              "skipped": false
+            },
+            {
+              "userId": 1,
+              "questionId": "Q8",
+              "selectedOption": "Almost never",
+              "confidence": 5,
+              "timeSpentMs": 2489,
+              "orderIndex": 7,
+              "skipped": false
+            },
+            {
+              "userId": 1,
+              "questionId": "Q9",
+              "selectedOption": "Flexible and open",
+              "confidence": 5,
+              "timeSpentMs": 2410,
+              "orderIndex": 8,
+              "skipped": false
+            },
+            {
+              "userId": 1,
+              "questionId": "Q10",
+              "selectedOption": "Delay decisions",
+              "confidence": 5,
+              "timeSpentMs": 2226,
+              "orderIndex": 9,
+              "skipped": false
+            },
+            {
+              "userId": 1,
+              "questionId": "Q11",
+              "selectedOption": "Not sure yet",
+              "confidence": 5,
+              "timeSpentMs": 1942,
+              "orderIndex": 10,
+              "skipped": false
+            },
+            {
+              "userId": 1,
+              "questionId": "Q12",
+              "selectedOption": "Stability",
+              "confidence": 5,
+              "timeSpentMs": 2232,
+              "orderIndex": 11,
+              "skipped": false
+            },
+            {
+              "userId": 1,
+              "questionId": "Q13",
+              "selectedOption": "Feel pressured",
+              "confidence": 5,
+              "timeSpentMs": 2005,
+              "orderIndex": 12,
+              "skipped": false
+            },
+            {
+              "userId": 1,
+              "questionId": "Q14",
+              "selectedOption": "Outcome-driven",
+              "confidence": 5,
+              "timeSpentMs": 1957,
+              "orderIndex": 13,
+              "skipped": false
+            },
+            {
+              "userId": 1,
+              "questionId": "Q15",
+              "selectedOption": "Keep options open",
+              "confidence": 5,
+              "timeSpentMs": 2488,
+              "orderIndex": 14,
+              "skipped": false
+            }
+          ],
+          "webhookUrl": "https://pranjal01.app.n8n.cloud/webhook-test/adaptive-learning-webhook",
+          "executionMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "LST": [
+      {
+        "json": {
+          "headers": {
+            "host": "pranjal01.app.n8n.cloud",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+            "content-length": "2631",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "117.254.129.134",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "IN",
+            "cf-ray": "9c669ed2c2c97f85-MAA",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "origin": "http://localhost:3000",
+            "priority": "u=1, i",
+            "referer": "http://localhost:3000/",
+            "sec-ch-ua": "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "x-forwarded-for": "117.254.129.134, 172.69.122.134",
+            "x-forwarded-host": "pranjal01.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-27-56cf765df-nxh6x",
+            "x-is-trusted": "yes",
+            "x-real-ip": "117.254.129.134"
+          },
+          "params": {},
+          "query": {},
+          "body": [
+            {
+              "userId": 1,
+              "questionId": 1,
+              "questionText": "Two alkanes have identical molecular formulas and nearly identical molar masses. Repeated measurements show a 12 °C difference in boiling point. No other data are provided. Which explanation cannot account for this observation?",
+              "selectedOption": "C",
+              "timestamp": "2026-01-31T04:50:58.013Z"
+            },
+            {
+              "userId": 1,
+              "questionId": 2,
+              "questionText": "An alkane has a higher boiling point than another alkane with greater molecular mass. Both are saturated hydrocarbons measured under identical conditions. Which statement must be false if this observation is reliable?",
+              "selectedOption": "D",
+              "timestamp": "2026-01-31T04:50:59.772Z"
+            },
+            {
+              "userId": 1,
+              "questionId": 3,
+              "questionText": "Three alkanes are compared. All have the same molecular formula. One is highly symmetrical, one moderately branched, one extended. Only the melting point of the symmetrical alkane is anomalously high. Which property is being selectively amplified?",
+              "selectedOption": "C",
+              "timestamp": "2026-01-31T04:51:01.997Z"
+            },
+            {
+              "userId": 1,
+              "questionId": 4,
+              "questionText": "An alkane exhibits a normal boiling point but an unexpectedly high melting point. No hydrogen bonding or polarity differences are possible. Which inference is most defensible?",
+              "selectedOption": "C",
+              "timestamp": "2026-01-31T04:51:03.960Z"
+            },
+            {
+              "userId": 1,
+              "questionId": 5,
+              "questionText": "Two alkanes show nearly identical boiling points but noticeably different melting points. Which conclusion follows with the least additional assumptions?",
+              "selectedOption": "C",
+              "timestamp": "2026-01-31T04:51:06.099Z"
+            },
+            {
+              "userId": 1,
+              "questionId": 6,
+              "questionText": "A student explains all boiling-point trends in alkanes using only molecular mass. This model succeeds for straight-chain alkanes but fails for branched isomers. What does this failure indicate?",
+              "selectedOption": "C",
+              "timestamp": "2026-01-31T04:51:10.733Z"
+            },
+            {
+              "userId": 1,
+              "questionId": 7,
+              "questionText": "An alkane is insoluble in water. No temperature, pressure, or mixing limitations apply. Which explanation survives elimination of irrelevant factors?",
+              "selectedOption": "D",
+              "timestamp": "2026-01-31T04:51:12.847Z"
+            },
+            {
+              "userId": 1,
+              "questionId": 8,
+              "questionText": "An alkane’s boiling point is higher than predicted by mass-based trends alone. No experimental anomalies are detected. Which inference is logically safest?",
+              "selectedOption": "C",
+              "timestamp": "2026-01-31T04:51:16.034Z"
+            },
+            {
+              "userId": 1,
+              "questionId": 8,
+              "questionText": "An alkane’s boiling point is higher than predicted by mass-based trends alone. No experimental anomalies are detected. Which inference is logically safest?",
+              "selectedOption": "C",
+              "timestamp": "2026-01-31T04:56:03.789Z"
+            }
+          ],
+          "webhookUrl": "https://pranjal01.app.n8n.cloud/webhook-test/bb8a47b4-7198-438a-9e89-a1a7a276bc2d",
+          "executionMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "merger001",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Question Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Question Generator Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insight Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Insight Generator Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conversation Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Question Generator Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Question Generator Agent": {
+      "main": [
+        [
+          {
+            "node": "Return Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insight Generator Agent": {
+      "main": [
+        [
+          {
+            "node": "Return Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Learner State Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Learner State Inference Engine",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Learner State Inference Engine": {
+      "main": [
+        [
+          {
+            "node": "LTM VAR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Learner State Inference Engine",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Learner State Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Question Generator Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "QUESTION_BANK": {
+      "main": [
+        [
+          {
+            "node": "merger001",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "merger001": {
+      "main": [
+        [
+          {
+            "node": "Learner State Inference Engine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TOPIC": {
+      "main": [
+        [
+          {
+            "node": "merger002",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Insight Generator Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Question Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LTM VAR": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "merger002",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "merger002": {
+      "main": [
+        [
+          {
+            "node": "Question Generator Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LST": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Insight Generator Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Insight Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Operation Type": {
+      "main": [
+        [
+          {
+            "node": "Prepare Onboarding Context",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Insight Context",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge Profile with Session Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Insight Generator Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "dbf181ee-7ed9-4b93-b031-be38e2b1ff48",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "84bffd09ba0b6211fa2f3f19f30ded937aa6868e6a4135383ba2ad71389302f6"
+  },
+  "id": "2vkQ2Uq1N9zYTLm9V2E2E",
+  "tags": []
+}

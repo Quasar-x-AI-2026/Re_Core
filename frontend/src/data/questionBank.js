@@ -1,4 +1,4 @@
-// Academic-neutral, human-universal diagnostic
+// Academic neutral, human universal diagnostic
 // Each question softly influences multiple latent variables
 
 export const QUESTION_BANK = [

@@ -2,6 +2,7 @@ import * as React from "react"
 import * as SeparatorPrimitive from "@radix-ui/react-separator"
 
 import { cn } from "@/lib/utils"
+// Utility function to merge class names safely
 
 const Separator = React.forwardRef((
   { className, orientation = "horizontal", decorative = true, ...props },

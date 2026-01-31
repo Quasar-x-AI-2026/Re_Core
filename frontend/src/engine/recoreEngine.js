@@ -13,11 +13,11 @@ import { buildRoadmap, shouldAllowCurriculumProjection } from './roadmapBuilder'
  * @returns {Object} Complete RECORE output with insights, trajectory, roadmap, mentorship signal
  */
 export function recoreEngine(rawSignals, questionBank, context = {}, existingTrajectory = null) {
-  // STEP 1: Extract statistical signals from raw interactions
+  // STEP 1:Extract statistical signals from raw interactions
   // These are atomic, timestamped behavioral markers
   const signals = extractSignals(rawSignals);
 
-  // STEP 2: Aggregate latent dimension scores from question mappings
+  // STEP 2:Aggregate latent dimension scores from question mappings
   // This combines user choices with confidence weighting
   const responses = rawSignals.map(r => ({
     questionId: r.questionId,
@@ -26,11 +26,11 @@ export function recoreEngine(rawSignals, questionBank, context = {}, existingTra
   }));
   const latentScores = aggregateLatentScores(responses, questionBank);
 
-  // STEP 3: Derive interpretable features from signals and latent scores
+  // STEP 3:Derive interpretable features from signals and latent scores
   // This is where "intelligence emerges from weak signals"
   const features = deriveFeatures(signals, latentScores);
 
-  // STEP 4: Initialize or update trajectory in 3D learning space
+  // STEP 4:Initialize or update trajectory in 3D learning space
   // Trajectory = current position + momentum in learning space
   let trajectory;
   if (existingTrajectory) {
@@ -39,26 +39,26 @@ export function recoreEngine(rawSignals, questionBank, context = {}, existingTra
     trajectory = initializeTrajectory(features);
   }
 
-  // STEP 5: Generate explainable insights
+  // STEP 5:Generate explainable insights
   // Every insight must be traceable to specific signals
   const insights = generateInsights(features, signals, latentScores, trajectory);
 
-  // STEP 6: Evaluate CVSC (Curriculum Voluntary Structural Commitment) eligibility
+  // STEP 6:Evaluate CVSC (Curriculum Voluntary Structural Commitment) eligibility
   // Only suggest curriculum projection when stability threshold is met
   const cvscEvaluation = evaluateCVSC(trajectory, features, context);
 
-  // STEP 7: Generate roadmap if CVSC is confirmed
+  // STEP 7:Generate roadmap if CVSC is confirmed
   // Roadmap is a projection, not a prescription
   let roadmap = null;
   if (context.curriculumCommitted && cvscEvaluation.allowed) {
     roadmap = buildRoadmap(trajectory, features, latentScores, context.curriculum);
   }
 
-  // STEP 8: Evaluate mentorship signal
+  // STEP 8:Evaluate mentorship signal
   // Mentorship suggested when exploration high + stability low
   const mentorSignal = evaluateMentorshipSignal(trajectory, features);
 
-  // STEP 9: Return structured intelligence output
+  // STEP 9:Return structured intelligence output
   return {
     trajectory,
     trajectoryInterpretation: interpretTrajectory(trajectory),

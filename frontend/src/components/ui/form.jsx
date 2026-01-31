@@ -1,4 +1,5 @@
 import * as React from "react"
+// Slot allows passing form controls
 import { Slot } from "@radix-ui/react-slot"
 import { Controller, FormProvider, useFormContext } from "react-hook-form";
 

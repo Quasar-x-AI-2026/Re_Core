@@ -8,7 +8,7 @@ const Breadcrumb = React.forwardRef(
   ({ ...props }, ref) => <nav ref={ref} aria-label="breadcrumb" {...props} />
 )
 Breadcrumb.displayName = "Breadcrumb"
-
+// Ordered list that holds breadcrumb items
 const BreadcrumbList = React.forwardRef(({ className, ...props }, ref) => (
   <ol
     ref={ref}

@@ -51,8 +51,9 @@ export const UniversitySearchPage = ({ user }) => {
   const [showResults, setShowResults] = useState(false);
 
   const handleGenerateList = async () => {
+    let result;
     try {
-      const result = generatePreferenceList(
+      result = generatePreferenceList(
         UNIVERSITY_DATA,
         weights,
         branchPreferences,
@@ -63,21 +64,35 @@ export const UniversitySearchPage = ({ user }) => {
 
       setPreferenceList(result.preferenceList);
       setShowResults(true);
+    } catch (error) {
+      console.error('Error generating list locally:', error);
+      toast.error('Failed to generate list');
+      return;
+    }
 
-      // Save to backend
-      await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/university/preferences`, {
+    // 2. Save to Backend
+    try {
+      const userIdStr = String(user.id);
+
+      // Save Preferences
+      const prefResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/university/preferences`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: user.id,
+          userId: userIdStr,
           weights,
           branchPreferences,
           instituteTypeOrder
         })
       });
 
-      await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/university/preferences/${user.id}/list`,
+      if (!prefResponse.ok) {
+        throw new Error(`Failed to save preferences: ${prefResponse.statusText}`);
+      }
+
+      // Save Generated List
+      const listResponse = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/university/preferences/${userIdStr}/list`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -85,10 +100,14 @@ export const UniversitySearchPage = ({ user }) => {
         }
       );
 
-      toast.success('Preference list generated!');
-    } catch (error) {
-      console.error('Error generating list:', error);
-      toast.error('Failed to generate list');
+      if (!listResponse.ok) {
+        throw new Error(`Failed to save list: ${listResponse.statusText}`);
+      }
+
+      toast.success('Preference list generated and saved!');
+    } catch (saveError) {
+      console.error('Error saving to backend:', saveError);
+      toast.warning('List generated, but failed to save to profile');
     }
   };
 
@@ -116,7 +135,7 @@ export const UniversitySearchPage = ({ user }) => {
 
   if (showResults) {
     return (
-      <div 
+      <div
         data-testid="university-results-page"
         className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 p-4 md:p-8"
       >
@@ -178,7 +197,7 @@ export const UniversitySearchPage = ({ user }) => {
                       </div>
                       <Badge variant={
                         option.estimatedAdmissionChance === 'High' ? 'default' :
-                        option.estimatedAdmissionChance === 'Moderate' ? 'secondary' : 'outline'
+                          option.estimatedAdmissionChance === 'Moderate' ? 'secondary' : 'outline'
                       }>
                         {option.estimatedAdmissionChance} Chance
                       </Badge>
@@ -209,7 +228,7 @@ export const UniversitySearchPage = ({ user }) => {
           <Card className="mt-8 bg-amber-50 border-amber-200">
             <CardContent className="pt-6">
               <p className="text-sm text-amber-800">
-                <strong>Note:</strong> This list is generated based on your criteria weights and preferences. 
+                <strong>Note:</strong> This list is generated based on your criteria weights and preferences.
                 Cutoff ranks are estimates. Always verify current admission criteria on official websites.
               </p>
             </CardContent>
@@ -220,7 +239,7 @@ export const UniversitySearchPage = ({ user }) => {
   }
 
   return (
-    <div 
+    <div
       data-testid="university-search-page"
       className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 p-4 md:p-8"
     >
@@ -380,3 +399,4 @@ export const UniversitySearchPage = ({ user }) => {
 };
 
 export default UniversitySearchPage;
+
